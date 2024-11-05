@@ -1,6 +1,9 @@
 dependencies:
-- name: global-templates
-  repository: https://xmcyber.github.io/helm-global-templates/
-  version: 1.0.1
-digest: sha256:19683e63c752a3a4646261c87445a8fd456dc211d25d1d114660c91a4f063fb2
-generated: "2024-11-05T20:59:49.684811+02:00"
+- name: chart-a
+  repository: ""
+  version: 0.1.0
+- name: chart-b
+  repository: ""
+  version: 0.1.0
+digest: sha256:418cb44a6dca647e5df5ed568e5953fa018f174f56188ccb4fdd001dad502c64
+generated: "2024-11-06T00:38:10.465085+02:00"

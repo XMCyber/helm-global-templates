@@ -1,0 +1,18 @@
+a-app-port: &a-app-port 8080
+a-namespace: &a-namespace "a-namespace"
+
+deployments:
+  - name: a-app
+    namespace: *a-namespace
+    containers:
+      - name: a-container
+        imageKey: a-image # This is the key on the images object in our parent chart
+        ports:
+          - containerPort: *a-app-port
+
+services:
+  - name: a-app
+    namespace: *a-namespace
+    ports:
+      - port: *a-app-port
+        targetPort: *a-app-port
