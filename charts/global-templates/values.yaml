@@ -25,7 +25,6 @@ microservice_defaults: &microservice_defaults
 
 exports:
   defaults:
-
     common_defaults:
       labels: {}
       annotations: {}
