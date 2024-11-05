@@ -24,7 +24,7 @@ metadata:
   name: {{ required "Name is required for configmap" $configmap.name }}
   namespace: {{ include "helpers.prefixNamespace" (dict "namespace" $ns "global" $global_values) }}
   labels: 
-    {{ include "helpers.labels" (dict "context" $ "customLabels" $configmap.labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+    {{- include "helpers.labels" (dict "context" $ "customLabels" $configmap.labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
   {{- if or $configmap.annotations $common_defaults.annotations }}
   annotations: 
     {{ include "helpers.annotations" (dict "context" $ "customAnnotations" $configmap.annotations "defaultAnnotations" $common_defaults.annotations) | nindent 4 }}

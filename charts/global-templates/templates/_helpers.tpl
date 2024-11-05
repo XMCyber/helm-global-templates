@@ -31,9 +31,15 @@ Author: Devops Infra Team
     {{ include "helpers.image.fullPath" (dict "container" . "global" $global_values) }}
 */}}
 {{- define "helpers.image.fullPath" -}}
-{{- $images := .global.images -}}
-{{- $registry := .global.registry -}}
+
+{{- $images := dict -}}
+{{- $registry := "" -}}
 {{- $container := .container -}}
+
+{{- if .global -}}
+  {{- $images = .global.images -}}
+  {{- $registry = .global.registry -}}
+{{- end -}}
 
 {{- $image := dict -}}
 
@@ -48,7 +54,7 @@ Author: Devops Infra Team
 {{- else if $container.imageKey }}
   {{- $imgConf := get $images $container.imageKey -}}
   {{- if not $imgConf }}
-    {{- fail (printf "Image with key '%s' not found" $container.imageKey) -}}
+    {{- fail (printf "Image with key '%s' not found" $container.imageKey $images) -}}
   {{- end -}}
   {{- if not $imgConf.repository }}
     {{- fail (printf "Image repository must be provided for key '%s'" $container.imageKey) -}}
@@ -144,7 +150,10 @@ Author: Devops Infra Team
     {{ include "helpers.prefixNamespace" (dict "namespace" "my-namespace" "global" $global_values) }}
 */}}
 {{- define "helpers.prefixNamespace" -}}
-{{- $prefix := .global.nsPrefix | default "" -}}
+{{- $prefix := "" -}}
+{{- if .global }}
+  {{- $prefix = .global.nsPrefix | default "" -}}
+{{- end -}}
 {{- $namespace := .namespace | required "namespace is required" -}}
 {{- if $prefix }}
   {{- printf "%s-%s" $prefix $namespace -}}
