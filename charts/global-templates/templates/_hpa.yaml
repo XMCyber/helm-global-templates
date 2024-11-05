@@ -1,0 +1,46 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.hpa" -}}
+{{- $global_values := .Values.global}}
+{{- $default_values := .Values.hpa_defaults }}
+{{- $common_defaults := .Values.common_defaults }}
+{{- range .hpas }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .name | default (include "common.names.fullname" $) }}
+  namespace: {{ include "helpers.prefixNamespace" (dict "namespace" .namespace "global" $global_values) }}
+  labels: {{ include "helpers.labels" (dict "context" $ "customLabels" .labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+  {{- if or .annotations $common_defaults.annotations .reloaderEnabled }}
+  annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations "reloaderEnabled" .reloaderEnabled) | nindent 4 }}
+  {{- end }}
+spec:
+  minReplicas: {{ .minReplicas | default $default_values.minReplicas }}
+  maxReplicas: {{ .maxReplicas | default $default_values.maxReplicas }}
+  scaleTargetRef:
+    apiVersion: {{ .targetApiVersion | default $default_values.targetApiVersion }}
+    kind: {{ .targetKind | default $default_values.targetKind }}
+    name: {{ required "targetName is required for each hpa" .targetName }}
+  metrics:
+  {{- if or .targetCPUUtilizationPercentage $default_values.targetCPUUtilizationPercentage}}
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: AverageValue
+        averageValue: {{ .targetCPUUtilizationPercentage | default $default_values.targetCPUUtilizationPercentage }}
+  {{- end}}
+  {{- if or .targetMemoryUtilizationPercentage $default_values.targetMemoryUtilizationPercentage}}
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: AverageValue
+        averageValue: {{ .targetMemoryUtilizationPercentage | default $default_values.targetMemoryUtilizationPercentage }}
+  {{- end}}
+{{- end}}
+{{- end}}

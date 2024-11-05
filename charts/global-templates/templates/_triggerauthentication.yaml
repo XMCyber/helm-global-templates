@@ -1,0 +1,33 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.triggerauthentication" -}}
+{{- $global_values := .Values.global}}
+{{- $default_values := .Values.triggerauthentication_defaults }}
+{{- $common_defaults := .Values.common_defaults }}
+{{- range .triggerauthentications }}
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ .name | default (include "common.names.fullname" $) }}
+  namespace: {{ include "helpers.prefixNamespace" (dict "namespace" .namespace "global" $global_values) }}
+  labels: {{ include "helpers.labels" (dict "context" $ "customLabels" .labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+  {{- if or .annotations $common_defaults.annotations .reloaderEnabled }}
+  annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations "reloaderEnabled" .reloaderEnabled) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .secretTargetRef }}
+  secretTargetRef:
+    {{- range .secretTargetRef }}
+    - name: {{ .name }}
+      key: {{ .key }}
+      parameter: {{ .parameter }}
+    {{- end }}
+  {{- else }}
+  {{- required ".secretTargetRef is required for TriggerAuthentication" .secretTargetRef }}
+  {{- end }}
+{{- end }}
+{{- end }}

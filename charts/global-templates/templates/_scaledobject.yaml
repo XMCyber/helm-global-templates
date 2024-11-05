@@ -1,0 +1,44 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.scaledobject" -}}
+{{- $global_values := .Values.global}}
+{{- $default_values := .Values.scaledobjects_defaults }}
+{{- $common_defaults := .Values.common_defaults }}
+{{- range .scaledobjects }}
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .name | default (include "common.names.fullname" $) }}
+  namespace: {{ include "helpers.prefixNamespace" (dict "namespace" .namespace "global" $global_values) }}
+  labels: {{ include "helpers.labels" (dict "context" $ "customLabels" .labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+  {{- if or .annotations $common_defaults.annotations .reloaderEnabled }}
+  annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations "reloaderEnabled" .reloaderEnabled) | nindent 4 }}
+  {{- end }}
+spec:
+  minReplicaCount: {{ .minReplicas | default $default_values.minReplicas }}
+  maxReplicaCount: {{ .maxReplicas | default $default_values.maxReplicas }}
+  pollingInterval: {{ .pollingInterval | default $default_values.pollingInterval }}
+  scaleTargetRef:
+    apiVersion: {{ .targetApiVersion | default $default_values.targetApiVersion }}
+    kind: {{ .targetKind | default $default_values.targetKind }}
+    name: {{ required "targetName is required for each hpa" .targetName }}
+  {{- if .triggers }}
+  triggers:
+    {{- range .triggers }}
+      - type: {{ .type }}
+        metadata:
+          {{- range $key, $value := .metadata }}
+          {{ $key }}: {{ include "helpers.renderGlobalIfExists" (dict "value" $value "global" $global_values) | quote }}
+          {{- end }}
+        {{- if .authenticationRef }}
+        authenticationRef:
+          name: {{ .authenticationRef.name }}
+        {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end}}
+{{- end}}

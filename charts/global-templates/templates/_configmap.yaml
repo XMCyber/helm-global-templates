@@ -1,0 +1,47 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.configmap" -}}
+{{- $files := .Files }}
+{{- $global_values := .Values.global }}
+{{- $common_defaults := .Values.common_defaults | default dict }}
+{{- range .configmaps }}
+{{- $configmap := . }}
+{{- $namespace := .namespace | default "" }}
+{{- $namespaces := .namespaces | default (list) }}
+{{- if and (empty $namespace) (eq (len $namespaces) 0) }}
+  {{- $namespaces = list (include "helpers.namespace" (dict "ns" .namespace "overrideNs" $.Release.Namespace )) }}
+{{- else if not (empty $namespace) }}
+  {{- $namespaces = list $namespace }}
+{{- end }}
+{{- range $ns := $namespaces }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ required "Name is required for configmap" $configmap.name }}
+  namespace: {{ include "helpers.prefixNamespace" (dict "namespace" $ns "global" $global_values) }}
+  labels: 
+    {{ include "helpers.labels" (dict "context" $ "customLabels" $configmap.labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+  {{- if or $configmap.annotations $common_defaults.annotations }}
+  annotations: 
+    {{ include "helpers.annotations" (dict "context" $ "customAnnotations" $configmap.annotations "defaultAnnotations" $common_defaults.annotations) | nindent 4 }}
+  {{- end }}
+data:
+  {{- if $configmap.data }}
+    {{- range $key, $val := $configmap.data }}
+  {{ $key }}: {{ $val }}
+    {{- end }}
+  {{- else if $configmap.file }}
+    {{- include "helpers.parseYamlFile" (dict "Filename" $configmap.file "Files" $files) | trim | nindent 2 }}
+  {{- else if $configmap.file_content }}
+    {{- range $key, $val := $configmap.file_content }}
+  {{ $key }}: |-
+    {{- $val | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

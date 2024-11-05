@@ -1,0 +1,18 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.namespace" -}}
+{{- $global_values := .Values.global}}
+{{- $common_defaults := .Values.common_defaults }}
+{{- range .namespaces }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: {{ include "helpers.prefixNamespace" (dict "namespace" . "global" $global_values) }}
+  name: {{ include "helpers.prefixNamespace" (dict "namespace" . "global" $global_values) }}
+{{- end }}
+{{- end }}

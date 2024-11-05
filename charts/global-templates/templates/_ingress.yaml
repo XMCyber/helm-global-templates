@@ -1,0 +1,53 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.ingress" -}}
+{{- $global_values := .Values.global}}
+{{- $default_values := .Values.ingress_defaults }}
+{{- $common_defaults := .Values.common_defaults }}
+{{- range .ingresses }}
+---
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" $ }}
+kind: Ingress
+metadata:
+  name: {{ required "Name is required for each ingress" .name }}
+  namespace: {{ include "helpers.prefixNamespace" (dict "namespace" .namespace "global" $global_values) }}
+  labels: {{ include "helpers.labels" (dict "context" $ "customLabels" .labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+  {{- if or .annotations $common_defaults.annotations }}
+  annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if or .ingressClassName $default_values.ingressClassName }}
+  ingressClassName: {{ .ingressClassName | default $default_values.ingressClassName }}
+  {{- end }}
+  {{- if or .rules $default_values.rules }}
+  rules:
+    {{- range .rules }}
+    - host: {{ include "helpers.renderGlobalIfExists" (dict "value" (.host | default $default_values.host) "global" $global_values) }}
+      http:
+        paths:
+          {{- range .http.paths }}
+          - path: {{ .path | default $default_values.path }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ .backend.service.name }}
+                port:
+                  number: {{ .backend.service.port.number }}
+          {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if or .tls $default_values.tls }}
+  tls:
+    {{- range .tls }}
+    - hosts:
+      {{- range .hosts }}
+      - {{ . }}
+      {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

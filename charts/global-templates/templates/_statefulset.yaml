@@ -1,0 +1,220 @@
+{{/*
+Copyright (C) 2024 XM Cyber
+Author: Devops Infra Team
+*/}}
+
+{{- define "global-templates.statefulset" -}}
+{{- $global_values := .Values.global }}
+{{- $default_values := .Values.statefuleset_defaults }}
+{{- $common_defaults := .Values.common_defaults }}
+{{- range .statefulsets }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .name | default (include "common.names.fullname" $) }}
+  namespace: {{ include "helpers.prefixNamespace" (dict "namespace" .namespace "global" $global_values) }}
+  labels: {{ include "helpers.labels" (dict "context" $ "customLabels" .labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+  {{- if or .annotations $common_defaults.annotations .reloaderEnabled }}
+  annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations "reloaderEnabled" .reloaderEnabled) | nindent 4 }}
+  {{- end }}
+spec:
+  serviceName: {{ .name | default (include "common.names.fullname" $) }}
+  {{- if and .replicas (not $default_values.autoscaling.enabled) }}
+  replicas: {{ .replicas }}
+  {{- end}}
+  {{- if .revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .revisionHistoryLimit }}
+  {{- end }}
+  {{- if .strategy }}
+  strategy: {{- toYaml .strategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .name | default (include "common.names.fullname" $) }}
+      {{- if .labels }}
+      {{- include "common.tplvalues.render" ( dict "value" .labels "context" $ ) | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      {{- if .podAnnotations }}
+      annotations:
+        {{- include "common.tplvalues.render" (dict "value" .podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" $ | nindent 8 }}
+        app: {{ .name | default (include "common.names.fullname" $) }}
+        {{- if .podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .podLabels "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ .serviceAccountName | default $default_values.serviceAccountName }}
+      {{- if .initContainers }}
+      initContainers:
+      {{- range .initContainers }}
+        - name: {{ .name }}
+          image: {{ include "helpers.image.fullPath" (dict "container" . "global" $global_values) }}
+          {{- if .command }}
+          command: {{ .command | toYaml | nindent 10 }}
+          {{- end }}
+          {{- if .args }}
+          args: {{ .args | toYaml | nindent 10 }}
+          {{- end }}
+          {{- if .env }}
+          env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 10 }}
+          {{- end }}
+          volumeMounts:
+            {{- range .volumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+              {{- if .readOnly }}
+              readOnly: {{ .readOnly }}
+              {{- end }}
+            {{- end }}
+          {{- if .resources }}
+          resources: {{ .resources | toYaml | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .restartPolicy }}
+      restartPolicy: {{ .restartPolicy }}
+      {{- end }}
+      containers:
+      {{- range .containers }}
+        - name: {{ required "Name is required for each container" .name }}
+          {{- if .securityContext }}
+          securityContext: {{- include "common.tplvalues.render" (dict "value" .securityContext "context" $) | nindent 12 }}
+          {{- end }}
+          image: {{ include "helpers.image.fullPath" (dict "container" . "global" $global_values) }}
+          imagePullPolicy: {{ .imagePullPolicy | default $default_values.imagePullPolicy }}
+          {{- if .command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .env }}
+          env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 12 }}
+          {{- end }}
+          {{- if .configMapRef }}
+          envFrom:
+            {{- range .configMapRef }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+          {{- end }}
+          {{- if .secretRef }}
+            {{- range .secretRef }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          {{- end }}
+          resources: {{- toYaml (.resources | default $default_values.resources) | nindent 12 }}
+          {{- if .volumeMounts }}
+          volumeMounts:
+          {{- if (kindIs "map" .volumeMounts) }}
+            {{- range $key, $value := .volumeMounts }}
+            - name: {{ $value.name }}
+              mountPath: {{ $value.mountPath }}
+              {{- if $value.subPath }}
+              subPath: {{ $value.subPath }}
+              {{- end }}
+              {{- if $value.readOnly }}
+              readOnly: {{ $value.readOnly }}
+              {{- end }}
+            {{- end }}
+          {{- else }}
+            {{- toYaml .volumeMounts | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .ports }}
+          ports: {{- include "common.tplvalues.render" (dict "value" .ports "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if and $default_values.livenessProbe.enabled (omit .livenessProbe "enabled") }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if and $default_values.readinessProbe.enabled (omit .readinessProbe "enabled") }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .readinessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if and $default_values.startupProbe.enabled (omit .startupProbe "enabled") }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .startupProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .lifecycle }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .lifecycle "context" $) | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- if .volumes }}
+      volumes:
+        {{- if (kindIs "map" .volumes) }}
+          {{- range $key, $value := .volumes }}
+          - name: {{ $value.name }}
+            {{- if $value.secret }}
+            secret:
+              secretName: {{ $value.secret.secretName }}
+            {{- end }}
+            {{- if $value.configMap }}
+            configMap:
+              name: {{ $value.configMap.name }}
+              {{- if $value.configMap.defaultMode }}
+              defaultMode: {{ $value.configMap.defaultMode }}
+              {{- end }}
+              items:
+                {{- range $value.configMap.items }}
+                - key: {{ .key }}
+                  path: {{ .path }}
+                {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- else }}
+          {{- toYaml .volumes | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if .hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .affinity }}
+      affinity: {{- include "common.tplvalues.render" ( dict "value" .affinity "context" $) | nindent 8 }}
+      {{- else if or .podAffinityPreset .podAntiAffinityPreset $default_values.nodeAffinityPreset.type }}
+      affinity:
+        {{- if not (empty .podAffinityPreset) }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .podAffinityPreset "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if not (empty .podAntiAffinityPreset) }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .podAntiAffinityPreset "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if not (empty $default_values.nodeAffinityPreset.type) }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" $default_values.nodeAffinityPreset.type "key" $default_values.nodeAffinityPreset.key "values" $default_values.nodeAffinityPreset.values) | nindent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- if .nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .priorityClassName }}
+      priorityClassName: {{ .priorityClassName | quote }}
+      {{- end }}
+      {{- if .topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .topologySpreadConstraints "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .schedulerName }}
+      schedulerName: {{ .schedulerName | quote }}
+      {{- end }}
+      {{- if .securityContext }}
+      securityContext: {{- .securityContext | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if not (quote .enableServiceLinks | empty) }}
+      enableServiceLinks: {{ .enableServiceLinks }}
+      {{- end}}
+      {{- if .terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
+      {{- end }}
+  {{- if .volumeClaimTemplates }}
+  volumeClaimTemplates:
+  {{- toYaml .volumeClaimTemplates | nindent 4 }}
+  {{- end}}
+{{- end -}}
+{{- end -}}
