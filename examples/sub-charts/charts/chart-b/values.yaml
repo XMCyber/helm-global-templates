@@ -1,0 +1,25 @@
+b-app-port: &b-app-port 8080
+b-namespace: &b-namespace "b-namespace"
+
+deployments:
+  - name: b-app
+    namespace: *b-namespace
+    containers:
+      - name: b-container
+        imageKey: b-image # This is the key on the images object in our parent chart
+        ports:
+          - containerPort: *b-app-port
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 256Mi
+          requests:
+            cpu: 1000m
+            memory: 256Mi
+
+services:
+  - name: b-app
+    namespace: *b-namespace
+    ports:
+      - port: *b-app-port
+        targetPort: *b-app-port

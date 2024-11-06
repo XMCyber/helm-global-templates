@@ -1,0 +1,15 @@
+global:
+  # Global registry for the images
+  registry: docker.io
+
+  # Images dictionary, this is used to define the images that will be used in the deployments
+  images:
+    a-image: # This is the key that will be used in the deployments to reference this image
+      repository: hello-world
+      tag: latest
+      #sha: "222" We can also use the digest of the image instead of the tag
+    b-image:
+      repository: nginx
+      tag: latest
+
+  injected-word: "injected"

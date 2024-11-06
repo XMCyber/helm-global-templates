@@ -1,0 +1,11 @@
+apiVersion: v2
+name: sub-charts
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+dependencies:
+  - name: chart-a
+    version: 0.1.0
+  - name: chart-b
+    version: 0.1.0

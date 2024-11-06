@@ -1,0 +1,14 @@
+apiVersion: v2
+name: chart-a
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+dependencies:
+  - name: global-templates
+    repository: file://../../../../charts/global-templates
+    import-values:
+      - defaults # This is the default values file for the global-templates chart
+  - name: common
+    version: 2.6.0
+    repository: https://charts.bitnami.com/bitnami

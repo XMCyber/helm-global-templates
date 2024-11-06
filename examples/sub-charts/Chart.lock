@@ -1,0 +1,9 @@
+dependencies:
+- name: chart-a
+  repository: ""
+  version: 0.1.0
+- name: chart-b
+  repository: ""
+  version: 0.1.0
+digest: sha256:418cb44a6dca647e5df5ed568e5953fa018f174f56188ccb4fdd001dad502c64
+generated: "2024-11-06T00:38:10.465085+02:00"
