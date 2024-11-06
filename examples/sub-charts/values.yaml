@@ -12,4 +12,5 @@ global:
       repository: nginx
       tag: latest
 
+  # A dummy key that will be injected into the sub-charts using the ^^global.{key}^^ syntax
   injected-word: "injected"
