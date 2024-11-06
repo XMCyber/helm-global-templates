@@ -1,9 +1,6 @@
 dependencies:
 - name: global-templates
-  repository: file://../../../../charts/global-templates
+  repository: https://xmcyber.github.io/helm-global-templates/
   version: 1.0.0
-- name: common
-  repository: https://charts.bitnami.com/bitnami
-  version: 2.6.0
-digest: sha256:3a83c2ea470d2afcc85e8f9782c949214a7f9a8d981f0cd0de0e52ae34c5ab5b
-generated: "2024-11-06T09:26:40.961443+02:00"
+digest: sha256:50a9b50778746e31e9dc1146d1ca36acf494ad7439933806cdb2f87055cbca48
+generated: "2024-11-06T09:44:25.869033+02:00"
