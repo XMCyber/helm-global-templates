@@ -12,16 +12,20 @@ Author: Devops Infra Team
 {{- $envArray := list -}}
 {{- $global := .global -}}
 
-{{- if .container.env }}
-{{- range $key, $value := .container.env }}
-{{- $envArray = append $envArray (dict "name" $key "value" $value) -}}
-{{- end }}
+{{- if kindIs "map" .container.env }}
+  {{- range $key, $value := .container.env }}
+    {{- $envArray = append $envArray (dict "name" $key "value" $value) -}}
+  {{- end }}
+{{- else if kindIs "slice" .container.env }}
+  {{- range .container.env }}
+    {{- $envArray = append $envArray (dict "name" .name "value" .value) -}}
+  {{- end }}
 {{- end }}
 
 {{- range $envArray }}
 {{- $renderedValue := include "helpers.renderGlobalIfExists" (dict "value" .value "global" $global) }}
 - name: {{ .name }}
-  value: {{ $renderedValue | quote }}
+  value: {{ $renderedValue }}
 {{- end }}
 {{- end }}
 
@@ -212,12 +216,14 @@ Usage:
 */}}
 {{- define "helpers.renderGlobalIfExists" -}}
 {{- $value := .value | default "" -}}
-{{- $global := .global | required "Global values are required" -}}
+{{- $global := .global | default dict -}}
 
 {{- if or (kindIs "int" $value) (kindIs "float64" $value) -}}
   {{- $value -}}
 {{- else if and (kindIs "string" $value) (eq $value "") -}}
   {{- "" -}}
+{{- else if eq (len $global) 0 -}}
+  {{- $value -}}
 {{- else -}}
   {{- range $key, $val := $global }}
     {{- if kindIs "string" $val -}}

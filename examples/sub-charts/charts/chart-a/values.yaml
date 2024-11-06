@@ -9,6 +9,15 @@ deployments:
         imageKey: a-image # This is the key on the images object in our parent chart
         ports:
           - containerPort: *a-app-port
+        env:
+          - name: INJECTED_WORD
+            # This is a global value that is injected into env variables dynamically at render time
+            # You can inject values from the global values file by using the ^^global.{key}^^ syntax
+            value: "I want to be ^^global.injected-word^^ here"
+          - name: VAR1
+            value: value
+          - name: VAR2
+            value: 1
 
 services:
   - name: a-app

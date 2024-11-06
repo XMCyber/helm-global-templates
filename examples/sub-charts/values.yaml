@@ -11,3 +11,5 @@ global:
     b-image:
       repository: nginx
       tag: latest
+
+  injected-word: "injected"
