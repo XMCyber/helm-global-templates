@@ -98,7 +98,7 @@ spec:
           {{- if .env }}
           env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 12 }}
           {{- end }}
-          {{- if .configMapRef }}
+          {{- if .envFrom }}
           envFrom:
             {{- range .configMapRef }}
             - configMapRef:
