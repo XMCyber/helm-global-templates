@@ -154,3 +154,11 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].envFrom[2].configMapRef.name
           value: app-config-rendered
+
+  - it: should set imagePullSecrets correctly
+    values:
+      - deployment_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: my-secret

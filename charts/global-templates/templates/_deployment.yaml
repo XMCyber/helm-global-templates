@@ -82,6 +82,12 @@ spec:
       {{- if .restartPolicy }}
       restartPolicy: {{ .restartPolicy }}
       {{- end }}
+      {{- if .imagePullSecrets}}
+      imagePullSecrets:
+        {{- range .imagePullSecrets }}
+        - name: {{ .name }}
+        {{- end }}
+      {{- end }}
       containers:
       {{- range .containers }}
         - name: {{ required "Name is required for each container" .name }}

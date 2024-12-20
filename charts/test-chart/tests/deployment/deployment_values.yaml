@@ -25,6 +25,8 @@ deployments:
         volumeMounts:
           - name: config-volume
             mountPath: /config
+    imagePullSecrets:
+      - name: my-secret
     containers:
       api-container: 
         name: api-container
