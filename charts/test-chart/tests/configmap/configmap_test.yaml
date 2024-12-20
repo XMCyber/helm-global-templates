@@ -28,7 +28,7 @@ tests:
           value: localhost
       - equal:
           path: data.DB_PORT
-          value: 5432
+          value: "5432"
       - equal:
           path: data.APP_ENV
           value: production
@@ -125,4 +125,4 @@ tests:
           value: value2
       - equal:
           path: data.nested_number
-          value: 22
+          value: "22"

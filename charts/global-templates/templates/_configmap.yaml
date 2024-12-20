@@ -32,7 +32,7 @@ metadata:
 data:
   {{- if $configmap.data }}
     {{- range $key, $val := $configmap.data }}
-  {{ $key }}: {{ include "helpers.renderGlobalIfExists" (dict "value" $val "global" $global_values) }}
+  {{ $key }}: {{ include "helpers.renderGlobalIfExists" (dict "value" $val "global" $global_values) | quote }}
     {{- end }}
   {{- else if $configmap.file }}
     {{- include "helpers.parseYamlFile" (dict "Filename" $configmap.file "Files" $files) | trim | nindent 2 }}
