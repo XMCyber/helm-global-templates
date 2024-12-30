@@ -6,6 +6,7 @@
 | ------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------ |
 | `roles`             | List of maps    | Yes      | A list containing Role configurations. Each item in the list defines a Role.                           |
 | `name`              | string          | Yes      | The name of the Role. If not provided, the `fullname` helper function will be used to generate a name. |
+| `disable`           | boolean         | No       | If true, disables the Role.                                                                            |
 | `namespace`         | string          | Yes      | The namespace in which the Role should be created.                                                     |
 | `labels`            | map             | No       | Custom labels for the Role.                                                                            |
 | `annotations`       | map             | No       | Annotations for the Role metadata.                                                                     |

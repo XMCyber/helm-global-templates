@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.scaledobjects_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .scaledobjects }}
+{{- if not .disable }}
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -40,5 +41,6 @@ spec:
         {{- end }}
     {{- end }}
   {{- end }}
-{{- end}}
-{{- end}}
+{{- end }}
+{{- end }}
+{{- end }}

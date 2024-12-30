@@ -6,6 +6,7 @@
 | --------------------------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
 | `statefulsets`                    | List of maps        | Yes      | A list containing StatefulSet configurations. Each item in the list defines a StatefulSet.                    |
 | `name`                            | string              | Yes      | The name of the StatefulSet. If not provided, the `fullname` helper function will be used to generate a name. |
+| `disable`                         | boolean             | No       | If true, disables the StatefulSet.                                                                            |
 | `namespace`                       | string              | Yes      | The namespace in which the StatefulSet should be created.                                                     |
 | `labels`                          | map                 | No       | Custom labels for the StatefulSet.                                                                            |
 | `annotations`                     | map                 | No       | Annotations for the StatefulSet metadata.                                                                     |

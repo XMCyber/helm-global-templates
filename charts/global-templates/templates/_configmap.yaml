@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $global_values := .Values.global }}
 {{- $common_defaults := .Values.common_defaults | default dict }}
 {{- range .configmaps }}
+{{- if not .disable }}
 {{- $configmap := . }}
 {{- $namespace := .namespace | default "" }}
 {{- $namespaces := .namespaces | default (list) }}
@@ -42,6 +43,7 @@ data:
     {{- $val | nindent 4 }}
   {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

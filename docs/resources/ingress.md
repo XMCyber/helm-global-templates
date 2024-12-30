@@ -6,6 +6,7 @@
 | -------------------------------------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------- |
 | `ingresses`                                        | List of maps    | Yes      | A list containing Ingress configurations. Each item in the list defines an Ingress.               |
 | `name`                                             | string          | Yes      | The name of the Ingress. This field is mandatory.                                                 |
+| `disable`                                          | boolean         | No       | If true, disables the Ingress.                                                                    |
 | `namespace`                                        | string          | Yes      | The namespace in which the Ingress should be created.                                             |
 | `labels`                                           | map             | No       | Custom labels for the Ingress.                                                                    |
 | `annotations`                                      | map             | No       | Annotations for the Ingress metadata.                                                             |

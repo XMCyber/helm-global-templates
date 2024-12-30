@@ -6,6 +6,7 @@
 | ------------------------------------------ | ------------ | -------- | -------------------------------------------------------------------------------------------------------- |
 | `clustersecretstores`                      | List of maps | Yes      | A list containing ClusterSecretStore configurations. Each item in the list defines a ClusterSecretStore. |
 | `name`                                     | string       | Yes      | The name of the ClusterSecretStore.                                                                      |
+| `disable`                                  | bool         | No       | Disables the ClusterSecretStore.                                                                         |
 | `labels`                                   | map          | No       | Custom labels for the ClusterSecretStore.                                                                |
 | `annotations`                              | map          | No       | Annotations for the ClusterSecretStore metadata.                                                         |
 | `controller`                               | string       | No       | The controller responsible for managing the ClusterSecretStore.                                          |

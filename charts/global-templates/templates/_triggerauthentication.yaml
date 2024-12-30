@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.triggerauthentication_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .triggerauthentications }}
+{{- if not .disable }}
 ---
 apiVersion: keda.sh/v1alpha1
 kind: TriggerAuthentication
@@ -29,5 +30,6 @@ spec:
   {{- else }}
   {{- required ".secretTargetRef is required for TriggerAuthentication" .secretTargetRef }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

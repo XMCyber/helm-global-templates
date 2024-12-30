@@ -6,6 +6,7 @@
 | -------------- | --------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
 | `configmaps`   | List of maps    | Yes      | A list containing ConfigMap configurations. Each item in the list defines a ConfigMap.                         |
 | `name`         | string          | Yes      | The name of the ConfigMap. This field is mandatory.                                                            |
+| `disable`      | bool            | No       | Disables the ConfigMap.                                                                                        |
 | `namespace`    | string          | No       | The namespace in which the ConfigMap should be created. If not provided, it defaults to the release namespace. |
 | `namespaces`   | List of strings | No       | A list of namespaces where the ConfigMap should be created. Overrides `namespace` if provided.                 |
 | `labels`       | map             | No       | Custom labels for the ConfigMap.                                                                               |

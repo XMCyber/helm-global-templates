@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.hpa_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .hpas }}
+{{- if not .disable }}
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -41,6 +42,7 @@ spec:
       target:
         type: AverageValue
         averageValue: {{ .targetMemoryUtilizationPercentage | default $default_values.targetMemoryUtilizationPercentage }}
-  {{- end}}
-{{- end}}
-{{- end}}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

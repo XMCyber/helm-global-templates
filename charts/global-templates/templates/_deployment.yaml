@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.deployment_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .deployments }}
+{{- if not .disable }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -229,5 +230,6 @@ spec:
       {{- if .terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
       {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

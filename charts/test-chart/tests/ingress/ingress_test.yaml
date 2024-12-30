@@ -111,6 +111,15 @@ tests:
           path: spec.rules[0].http.paths[1].path
           value: /web
 
+  - it: should not render ingress if disabled
+    values:
+      - ingress_values.yaml
+    set:
+      ingresses.app-ingress.disable: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should set annotations correctly
     values:
       - ingress_values.yaml

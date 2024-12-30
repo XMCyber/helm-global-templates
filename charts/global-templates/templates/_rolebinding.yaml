@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.rolebinding_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .rolebindings }}
+{{- if not .disable }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -31,5 +32,6 @@ roleRef:
   kind: {{- include "helpers.validateEnumValue" (list .roleRef.kind (list "Role" "ClusterRole")) }} {{ .roleRef.kind }}
   name: {{ required "Name is required for roleRef" .roleRef.name }}
   apiGroup: rbac.authorization.k8s.io
+{{- end }}
 {{- end }}
 {{- end }}

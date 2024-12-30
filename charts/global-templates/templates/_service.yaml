@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.service_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .services }}
+{{- if not .disable }}
 ---
 {{- $type := .type | default "ClusterIP" }}
 apiVersion: v1
@@ -46,5 +47,6 @@ spec:
   externalTrafficPolicy: {{ .externalTrafficPolicy | quote }}
   {{- end }}
   ports: {{- include "common.tplvalues.render" (dict "value" .ports "context" $) | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}

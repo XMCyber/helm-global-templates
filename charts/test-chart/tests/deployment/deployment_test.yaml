@@ -155,6 +155,15 @@ tests:
           path: spec.template.spec.containers[0].envFrom[2].configMapRef.name
           value: app-config-rendered
 
+  - it: should not render deployment if disabled
+    values:
+      - deployment_values.yaml
+    set:
+      deployments.api.disable: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should set imagePullSecrets correctly
     values:
       - deployment_values.yaml

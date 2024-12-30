@@ -61,6 +61,15 @@ tests:
           path: rules[1].resources
           value: ["deployments"]
 
+  - it: should not render role if disabled
+    values:
+      - role_values.yaml
+    set:
+      roles.app-role.disable: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should set annotations correctly
     values:
       - role_values.yaml

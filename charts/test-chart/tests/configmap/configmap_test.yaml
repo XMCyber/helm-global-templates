@@ -73,6 +73,16 @@ tests:
               host: localhost
               port: 5432
 
+  - it: should not render configmap if disabled
+    set:
+      configmaps:
+        - name: app-config
+          namespace: test-namespace
+          disable: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should create multiple configmaps for different namespaces
     set:
       configmaps:

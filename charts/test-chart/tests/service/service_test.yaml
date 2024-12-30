@@ -56,6 +56,15 @@ tests:
           path: spec.clusterIP
           value: None
 
+  - it: should not render service if disabled
+    values:
+      - service_values.yaml
+    set:
+      services.api.disable: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should create LoadBalancer service with external traffic policy
     values:
       - service_values.yaml

@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.statefuleset_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .statefulsets }}
+{{- if not .disable }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -235,5 +236,6 @@ spec:
   volumeClaimTemplates:
   {{- toYaml .volumeClaimTemplates | nindent 4 }}
   {{- end}}
+{{- end -}}
 {{- end -}}
 {{- end -}}

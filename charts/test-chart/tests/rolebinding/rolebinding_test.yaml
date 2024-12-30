@@ -69,6 +69,15 @@ tests:
           path: roleRef.apiGroup
           value: rbac.authorization.k8s.io
 
+  - it: should not render rolebinding if disabled
+    values:
+      - rolebinding_values.yaml
+    set:
+      rolebindings.app-rolebinding.disable: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: should set multiple subjects
     values:
       - rolebinding_values.yaml

@@ -8,6 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.roles_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .roles }}
+{{- if not .disable }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -24,5 +25,6 @@ rules:
     resources: {{ include "helpers.copyArray" .resources }}
     verbs: {{ include "helpers.copyArray" .verbs }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
