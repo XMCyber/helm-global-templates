@@ -21,7 +21,7 @@ metadata:
   {{- end }}
 spec:
   {{- if or .ingressClassName $default_values.ingressClassName }}
-  ingressClassName: {{ .ingressClassName | default $default_values.ingressClassName }}
+  ingressClassName: {{ include "helpers.renderGlobalIfExists" (dict "value" (.ingressClassName | default $default_values.ingressClassName) "global" $global_values) }}
   {{- end }}
   {{- if or .rules $default_values.rules }}
   rules:

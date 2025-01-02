@@ -120,6 +120,17 @@ tests:
       - hasDocuments:
           count: 0
 
+  - it: should render global in ingressClassName
+    values:
+      - ingress_values.yaml
+    set:
+      global.test: aaa
+      ingresses.app-ingress.ingressClassName: test-{{global.test}}
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: test-aaa
+
   - it: should set annotations correctly
     values:
       - ingress_values.yaml
