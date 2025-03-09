@@ -71,7 +71,7 @@ tests:
           value: config-volume
       - equal:
           path: spec.volumeClaimTemplates[0].metadata.name
-          value: my-pvc 
+          value: my-pvc
       - equal:
           path: spec.template.spec.containers[0].volumeMounts[0].name
           value: config-volume
@@ -125,3 +125,31 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should set livenessProbe correctly
+    values:
+      - statefulset_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /health
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+          value: 8080
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 15
+
+  - it: should set readinessProbe correctly
+    values:
+      - statefulset_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /ready
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+          value: 8080
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 5

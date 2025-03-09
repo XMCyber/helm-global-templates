@@ -64,7 +64,7 @@ statefulsets:
           httpGet:
             path: /health
             port: 8080
-          initialDelaySeconds: 10
+          initialDelaySeconds: 15
         readinessProbe:
           httpGet:
             path: /ready

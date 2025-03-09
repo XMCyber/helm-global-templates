@@ -1,12 +1,6 @@
 microservice_defaults: &microservice_defaults
   serviceAccountName: default
   imagePullPolicy: IfNotPresent
-  livenessProbe:
-    enabled: false
-  readinessProbe:
-    enabled: false
-  startupProbe:
-    enabled: false
   nodeAffinityPreset:
     type: ""
   serviceAccount:

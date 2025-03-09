@@ -139,13 +139,13 @@ spec:
           {{- if .ports }}
           ports: {{- include "common.tplvalues.render" (dict "value" .ports "context" $) | nindent 12 }}
           {{- end }}
-          {{- if and $default_values.livenessProbe.enabled (omit .livenessProbe "enabled") }}
-          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- if .livenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .livenessProbe "context" $) | nindent 12 }}
           {{- end }}
-          {{- if and $default_values.readinessProbe.enabled (omit .readinessProbe "enabled") }}
+          {{- if .readinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .readinessProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
-          {{- if and $default_values.startupProbe.enabled (omit .startupProbe "enabled") }}
+          {{- if .startupProbe }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .startupProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
           {{- if .lifecycle }}
