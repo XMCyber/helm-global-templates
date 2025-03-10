@@ -126,6 +126,29 @@ tests:
       - hasDocuments:
           count: 0
 
+  - it: should set valueFrom correctly
+    values:
+      - statefulset_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: key
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.configMapKeyRef.name
+          value: app-config
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.configMapKeyRef.key
+          value: keyRef
+      - equal:
+          path: spec.template.spec.containers[0].env[2].name
+          value: key2
+      - equal:
+          path: spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.name
+          value: app-secret
+      - equal:
+          path: spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.key
+          value: key2Ref
+
   - it: should set livenessProbe correctly
     values:
       - statefulset_values.yaml

@@ -12,20 +12,29 @@ Author: Devops Infra Team
 {{- $envArray := list -}}
 {{- $global := .global -}}
 
+{{/* Process regular env variables */}}
 {{- if kindIs "map" .container.env }}
   {{- range $key, $value := .container.env }}
-    {{- $envArray = append $envArray (dict "name" $key "value" $value) -}}
+    {{- if kindIs "map" $value }}
+      {{- $envArray = append $envArray (dict "name" $key "valueFrom" $value.valueFrom) -}}
+    {{- else }}
+      {{- $envArray = append $envArray (dict "name" $key "value" $value) -}}
+    {{- end }}
   {{- end }}
 {{- else if kindIs "slice" .container.env }}
-  {{- range .container.env }}
-    {{- $envArray = append $envArray (dict "name" .name "value" .value) -}}
-  {{- end }}
+  {{- $envArray = .container.env -}}
 {{- end }}
 
 {{- range $envArray }}
+{{- if hasKey . "value" }}
 {{- $renderedValue := include "helpers.renderGlobalIfExists" (dict "value" (.value | quote) "global" $global) }}
 - name: {{ .name }}
   value: {{ $renderedValue }}
+{{- else if hasKey . "valueFrom" }}
+- name: {{ .name }}
+  valueFrom:
+    {{- toYaml .valueFrom | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}
 
