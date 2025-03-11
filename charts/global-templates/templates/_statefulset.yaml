@@ -154,29 +154,32 @@ spec:
       {{- end }}
       {{- if .volumes }}
       volumes:
-        {{- if (kindIs "map" .volumes) }}
-          {{- range $key, $value := .volumes }}
-          - name: {{ $value.name }}
-            {{- if $value.secret }}
-            secret:
-              secretName: {{ $value.secret.secretName }}
-            {{- end }}
-            {{- if $value.configMap }}
-            configMap:
-              name: {{ $value.configMap.name }}
-              {{- if $value.configMap.defaultMode }}
-              defaultMode: {{ $value.configMap.defaultMode }}
-              {{- end }}
-              items:
-                {{- range $value.configMap.items }}
-                - key: {{ .key }}
-                  path: {{ .path }}
-                {{- end }}
-            {{- end }}
+      {{- if (kindIs "map" .volumes) }}
+        {{- range $key, $value := .volumes }}
+        - name: {{ $value.name }}
+          {{- if $value.secret }}
+          secret:
+            secretName: {{ $value.secret.secretName }}
           {{- end }}
-        {{- else }}
-          {{- toYaml .volumes | nindent 8 }}
+          {{- if $value.projected }}
+          projected: {{- include "common.tplvalues.render" (dict "value" $value.projected "context" $) | nindent 14 }}
+          {{- end }}
+          {{- if $value.configMap }}
+          configMap:
+            name: {{ $value.configMap.name }}
+            {{- if $value.configMap.defaultMode }}
+            defaultMode: {{ $value.configMap.defaultMode }}
+            {{- end }}
+            items:
+              {{- range $value.configMap.items }}
+              - key: {{ .key }}
+                path: {{ .path }}
+              {{- end }}
+          {{- end }}
         {{- end }}
+      {{- else }}
+        {{- toYaml .volumes | nindent 8 }}
+      {{- end }}
       {{- end }}
       {{- if .hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .hostAliases "context" $) | nindent 8 }}

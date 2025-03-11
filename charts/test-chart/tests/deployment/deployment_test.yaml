@@ -92,6 +92,23 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts[0].mountPath
           value: /config
 
+  - it: should set projected volumes correctly
+    values:
+      - deployment_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[1].name
+          value: projected-volume
+      - equal:
+          path: spec.template.spec.volumes[1].projected.sources[0].secret.name
+          value: mysecret
+      - equal:
+          path: spec.template.spec.volumes[1].projected.sources[0].secret.items[0].key
+          value: username
+      - equal:
+          path: spec.template.spec.volumes[1].projected.sources[0].secret.items[0].path
+          value: my-group/my-username
+
   - it: should set affinity rules correctly
     values:
       - deployment_values.yaml

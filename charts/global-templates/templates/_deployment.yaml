@@ -162,6 +162,9 @@ spec:
           secret:
             secretName: {{ $value.secret.secretName }}
           {{- end }}
+          {{- if $value.projected }}
+          projected: {{- include "common.tplvalues.render" (dict "value" $value.projected "context" $) | nindent 14 }}
+          {{- end }}
           {{- if $value.configMap }}
           configMap:
             name: {{ $value.configMap.name }}

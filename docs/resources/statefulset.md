@@ -40,6 +40,7 @@
 | `containers[].lifecycle`          | object              | No       | Lifecycle hooks for the container.                                                                            |
 | `volumes`                         | List of maps or map | No       | Volumes available to be mounted by containers.                                                                |
 | `volumes[].name`                  | string              | Yes      | The name of the volume.                                                                                       |
+| `volumes[].projected`             | map                 | No       | Projected volume configuration.                                                                               |
 | `volumes[].secret`                | map                 | No       | Secret configuration.                                                                                         |
 | `volumes[].secret.secretName`     | string              | Yes      | The name of the secret.                                                                                       |
 | `volumes[].configMap`             | map                 | No       | ConfigMap configuration.                                                                                      |

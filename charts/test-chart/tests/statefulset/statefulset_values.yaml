@@ -88,6 +88,15 @@ statefulsets:
           items:
             - key: config.yaml
               path: config.yaml
+      projected-volume:
+        name: projected-volume
+        projected:
+          sources:
+          - secret:
+              name: mysecret
+              items:
+                - key: username
+                  path: my-group/my-username
     securityContext:
       runAsNonRoot: true
     serviceAccountName: api-sa
