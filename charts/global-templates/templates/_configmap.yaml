@@ -8,7 +8,7 @@ Author: Devops Infra Team
 {{- $global_values := .Values.global }}
 {{- $common_defaults := .Values.common_defaults | default dict }}
 {{- range .configmaps }}
-{{- if not .disable }}
+{{- if not .disabled }}
 {{- $configmap := . }}
 {{- $namespace := .namespace | default "" }}
 {{- $namespaces := .namespaces | default (list) }}

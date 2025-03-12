@@ -6,7 +6,7 @@
 | ---------------------- | ------------ | -------- | ------------------------------------------------------------------------------------------------------------ |
 | `deployments`          | List of maps | Yes      | A list containing deployment configurations. Each item in the list defines a deployment.                     |
 | `name`                 | string       | Yes      | The name of the deployment. If not provided, the `fullname` helper function will be used to generate a name. |
-| `disable`              | boolean      | No       | If true, disables the deployment.                                                                            |
+| `disabled`              | boolean      | No       | If true, disables the deployment.                                                                            |
 | `namespace`            | string       | Yes      | The namespace in which the deployment should be created.                                                     |
 | `replicas`             | integer      | No       | The number of desired pod replicas. This is ignored if `autoscaling` is enabled in `deployment_defaults`.    |
 | `revisionHistoryLimit` | integer      | No       | The number of old ReplicaSets to retain for rollback purposes.                                               |

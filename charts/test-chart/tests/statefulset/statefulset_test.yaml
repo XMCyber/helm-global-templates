@@ -138,7 +138,7 @@ tests:
     values:
       - statefulset_values.yaml
     set:
-      statefulsets.my-statefulset.disable: true
+      statefulsets.my-statefulset.disabled: true
     asserts:
       - hasDocuments:
           count: 0

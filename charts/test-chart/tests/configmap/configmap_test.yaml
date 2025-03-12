@@ -78,7 +78,7 @@ tests:
       configmaps:
         - name: app-config
           namespace: test-namespace
-          disable: true
+          disabled: true
     asserts:
       - hasDocuments:
           count: 0

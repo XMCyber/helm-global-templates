@@ -8,7 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.ingress_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .ingresses }}
-{{- if not .disable }}
+{{- if not .disabled }}
 ---
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" $ }}
 kind: Ingress

@@ -8,7 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.service_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .services }}
-{{- if not .disable }}
+{{- if not .disabled }}
 ---
 {{- $type := .type | default "ClusterIP" }}
 apiVersion: v1

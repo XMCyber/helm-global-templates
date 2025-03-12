@@ -73,7 +73,7 @@ tests:
     values:
       - rolebinding_values.yaml
     set:
-      rolebindings.app-rolebinding.disable: true
+      rolebindings.app-rolebinding.disabled: true
     asserts:
       - hasDocuments:
           count: 0

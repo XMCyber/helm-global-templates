@@ -8,7 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.statefuleset_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .statefulsets }}
-{{- if not .disable }}
+{{- if not .disabled }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet

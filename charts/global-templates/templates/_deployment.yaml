@@ -8,7 +8,7 @@ Author: Devops Infra Team
 {{- $default_values := .Values.deployment_defaults }}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .deployments }}
-{{- if not .disable }}
+{{- if not .disabled }}
 ---
 apiVersion: apps/v1
 kind: Deployment

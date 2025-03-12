@@ -60,7 +60,7 @@ tests:
     values:
       - service_values.yaml
     set:
-      services.api.disable: true
+      services.api.disabled: true
     asserts:
       - hasDocuments:
           count: 0

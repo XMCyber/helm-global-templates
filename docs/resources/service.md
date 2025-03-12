@@ -6,7 +6,7 @@
 | -------------------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
 | `services`                 | List of maps      | Yes      | A list containing service configurations. Each item in the list defines a service.                           |
 | `name`                     | string            | Yes      | The name of the service. This field is mandatory.                                                            |
-| `disable`                  | boolean           | No       | If true, disables the service.                                                                               |
+| `disabled`                  | boolean           | No       | If true, disables the service.                                                                               |
 | `namespace`                | string            | Yes      | The namespace in which the service should be created.                                                        |
 | `type`                     | string            | No       | The type of service (e.g., `ClusterIP`, `NodePort`, `LoadBalancer`). Defaults to `ClusterIP`.                |
 | `labels`                   | map               | No       | Custom labels for the service.                                                                               |

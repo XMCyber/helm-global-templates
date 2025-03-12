@@ -65,7 +65,7 @@ tests:
     values:
       - role_values.yaml
     set:
-      roles.app-role.disable: true
+      roles.app-role.disabled: true
     asserts:
       - hasDocuments:
           count: 0

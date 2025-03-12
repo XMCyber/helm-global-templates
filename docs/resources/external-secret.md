@@ -6,7 +6,7 @@
 | ------------------------------------- | ------------ | -------- | ----------------------------------------------------------------------------------------------------- |
 | `externalsecrets`                     | List of maps | Yes      | A list containing ExternalSecret configurations. Each item in the list defines an ExternalSecret.     |
 | `name`                                | string       | Yes      | The name of the ExternalSecret. This field is mandatory.                                              |
-| `disable`                             | boolean      | No       | If true, disables the ExternalSecret.                                                                 |
+| `disabled`                             | boolean      | No       | If true, disables the ExternalSecret.                                                                 |
 | `namespace`                           | string       | Yes      | The namespace in which the ExternalSecret should be created.                                          |
 | `labels`                              | map          | No       | Custom labels for the ExternalSecret.                                                                 |
 | `annotations`                         | map          | No       | Annotations for the ExternalSecret metadata.                                                          |

@@ -6,7 +6,7 @@
 | ---------------------- | ------------ | -------- | ------------------------------------------------------------------------------------------------------------- |
 | `rolebindings`         | List of maps | Yes      | A list containing RoleBinding configurations. Each item in the list defines a RoleBinding.                    |
 | `name`                 | string       | Yes      | The name of the RoleBinding. If not provided, the `fullname` helper function will be used to generate a name. |
-| `disable`              | boolean      | No       | If true, disables the RoleBinding.                                                                            |
+| `disabled`              | boolean      | No       | If true, disables the RoleBinding.                                                                            |
 | `namespace`            | string       | Yes      | The namespace in which the RoleBinding should be created.                                                     |
 | `labels`               | map          | No       | Custom labels for the RoleBinding.                                                                            |
 | `annotations`          | map          | No       | Annotations for the RoleBinding metadata.                                                                     |

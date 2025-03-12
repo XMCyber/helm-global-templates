@@ -199,7 +199,7 @@ tests:
     values:
       - deployment_values.yaml
     set:
-      deployments.api.disable: true
+      deployments.api.disabled: true
     asserts:
       - hasDocuments:
           count: 0

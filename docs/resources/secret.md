@@ -6,7 +6,7 @@
 | ------------- | ------------ | -------- | --------------------------------------------------------------------------------------------- |
 | `secrets`     | List of maps | Yes      | A list containing Secret configurations. Each item in the list defines a Secret.              |
 | `name`        | string       | Yes      | The name of the Secret. This field is mandatory.                                              |
-| `disable`     | bool         | No       | Disables the Secret.                                                                          |
+| `disabled`     | bool         | No       | Disables the Secret.                                                                          |
 | `namespace`   | string       | Yes      | The namespace in which the Secret should be created.                                          |
 | `labels`      | map          | No       | Custom labels for the Secret.                                                                 |
 | `annotations` | map          | No       | Annotations for the Secret metadata.                                                          |

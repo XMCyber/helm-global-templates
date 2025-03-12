@@ -115,7 +115,7 @@ tests:
     values:
       - ingress_values.yaml
     set:
-      ingresses.app-ingress.disable: true
+      ingresses.app-ingress.disabled: true
     asserts:
       - hasDocuments:
           count: 0
