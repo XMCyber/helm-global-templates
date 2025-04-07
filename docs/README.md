@@ -15,6 +15,7 @@
 - [RoleBinding](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/rolebinding.md)
 - [ServiceAccount](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/serviceaccount.md)
 - [SealedSecret](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/sealedsecret.md)
+- [PDB](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/pdb.md)
 
 > **Note:** If you need a resource that is not listed here, feel free to open an issue or a pull request. we prefer pull requests :)
 

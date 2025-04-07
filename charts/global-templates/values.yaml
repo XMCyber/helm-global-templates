@@ -69,3 +69,8 @@ exports:
       targetApiVersion: apps/v1
       targetKind: Deployment
       targetCPUUtilizationPercentage: 60
+    
+    pdb_defaults:
+      minAvailable: 1
+      maxUnavailable: 1
+      matchLabels: { }

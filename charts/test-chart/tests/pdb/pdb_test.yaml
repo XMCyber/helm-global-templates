@@ -1,0 +1,58 @@
+suite: Test PDB template
+templates:
+  - template.yaml
+
+tests:
+  - it: should create basic pdb correctly
+    values:
+      - pdb_values.yaml
+    asserts:
+      - equal:
+          path: kind
+          value: PodDisruptionBudget
+      - equal:
+          path: apiVersion
+          value: policy/v1
+      - equal:
+          path: metadata.name
+          value: app-pdb
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - equal:
+          path: spec.minAvailable
+          value: 2
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: test-app
+
+  - it: should set annotations correctly
+    values:
+      - pdb_values.yaml
+    set:
+      pdbs.app-pdb.annotations:
+        test-annotation: test-value
+    asserts:
+      - equal:
+          path: metadata.annotations["test-annotation"]
+          value: test-value
+
+  - it: should set labels correctly
+    values:
+      - pdb_values.yaml
+    set:
+      pdbs.app-pdb.labels:
+        custom-label: test-value
+    asserts:
+      - equal:
+          path: metadata.labels["custom-label"]
+          value: test-value
+  
+  - it: should not render pdb if disabled
+    values:
+      - pdb_values.yaml
+    set:
+      pdbs.app-pdb.disabled: true
+    asserts:
+      - hasDocuments:
+          count: 0

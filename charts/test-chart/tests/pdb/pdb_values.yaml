@@ -1,0 +1,7 @@
+pdbs:
+  app-pdb:
+    name: app-pdb
+    namespace: test-namespace
+    minAvailable: 2
+    matchLabels:
+      app: test-app
