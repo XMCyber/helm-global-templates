@@ -22,6 +22,13 @@ deployments:
           - /bin/sh
           - -c
           - "echo 'db initialized'"
+        envFrom:
+          - configMapRef:
+              name: init-db-config
+          - secretRef:
+              name: init-db-secret
+          - configMapRef:
+              name: init-db-config-{{ global.render_key }}
         volumeMounts:
           - name: config-volume
             mountPath: /config

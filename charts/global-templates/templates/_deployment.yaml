@@ -64,6 +64,19 @@ spec:
           {{- if .env }}
           env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 10 }}
           {{- end }}
+          {{- if .envFrom }}
+          envFrom:
+          {{- range .envFrom }}
+          {{- if .configMapRef }}
+          - configMapRef:
+              name: {{ include "helpers.renderGlobalIfExists" (dict "value" (.configMapRef.name | quote) "global" $global_values) }}
+          {{- end }}
+          {{- if .secretRef }}
+          - secretRef:
+              name: {{ include "helpers.renderGlobalIfExists" (dict "value" (.secretRef.name | quote) "global" $global_values) }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
           volumeMounts:
             {{- range .volumeMounts }}
             - name: {{ .name }}

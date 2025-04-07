@@ -48,16 +48,17 @@
 
 ## Init Containers-Level Parameters
 
-| Parameter                       | Type            | Required | Description                                          |
-| ------------------------------- | --------------- | -------- | ---------------------------------------------------- |
-| `initContainers`                | List of maps    | No       | Configuration for init containers.                   |
-| `initContainers[].name`         | string          | Yes      | The name of the init container.                      |
-| `initContainers[].image`        | object          | Yes      | The image details for the init container.            |
-| `initContainers[].command`      | List of strings | No       | The command to run in the init container.            |
-| `initContainers[].args`         | List of strings | No       | Arguments for the init container.                    |
-| `initContainers[].env`          | List of maps    | No       | Environment variables for the init container.        |
-| `initContainers[].volumeMounts` | List of maps    | No       | Volumes to mount into the init container.            |
-| `initContainers[].resources`    | object          | No       | Resource requests and limits for the init container. |
+| Parameter                       | Type            | Required | Description                                                                     |
+|---------------------------------|-----------------|----------|---------------------------------------------------------------------------------|
+| `initContainers`                | List of maps    | No       | Configuration for init containers.                                              |
+| `initContainers[].name`         | string          | Yes      | The name of the init container.                                                 |
+| `initContainers[].image`        | object          | Yes      | The image details for the init container.                                       |
+| `initContainers[].command`      | List of strings | No       | The command to run in the init container.                                       |
+| `initContainers[].args`         | List of strings | No       | Arguments for the init container.                                               |
+| `initContainers[].env`          | List of maps    | No       | Environment variables for the init container.                                   |
+| `containers[].envFrom`          | List of maps    | No       | Environment sources for the init container (e.g., `configMapRef`, `secretRef`). |
+| `initContainers[].volumeMounts` | List of maps    | No       | Volumes to mount into the init container.                                       |
+| `initContainers[].resources`    | object          | No       | Resource requests and limits for the init container.                            |
 
 ## Other Parameters
 
