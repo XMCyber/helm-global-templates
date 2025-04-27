@@ -53,7 +53,7 @@ spec:
       {{- if .initContainers }}
       initContainers:
       {{- range .initContainers }}
-        - name: {{ .name }}
+        - name: {{ include "helpers.renderGlobalIfExists" (dict "value" (required "Name is required for each init container" .name | quote) "global" $global_values) }}
           image: {{ include "helpers.image.fullPath" (dict "container" . "global" $global_values) }}
           {{- if .command }}
           command: {{ .command | toYaml | nindent 10 }}
@@ -104,7 +104,7 @@ spec:
       {{- end }}
       containers:
       {{- range .containers }}
-        - name: {{ required "Name is required for each container" .name }}
+        - name: {{ include "helpers.renderGlobalIfExists" (dict "value" (required "Name is required for each container" .name | quote) "global" $global_values) }}
           {{- if .securityContext }}
           securityContext: {{- include "common.tplvalues.render" (dict "value" .securityContext "context" $) | nindent 12 }}
           {{- end }}

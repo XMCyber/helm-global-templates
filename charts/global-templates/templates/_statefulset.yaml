@@ -52,7 +52,7 @@ spec:
       {{- if .initContainers }}
       initContainers:
       {{- range .initContainers }}
-        - name: {{ .name }}
+        - name: {{ include "helpers.renderGlobalIfExists" (dict "value" (required "Name is required for each init container" .name | quote) "global" $global_values) }}
           image: {{ include "helpers.image.fullPath" (dict "container" . "global" $global_values) }}
           {{- if .command }}
           command: {{ .command | toYaml | nindent 10 }}
@@ -62,6 +62,19 @@ spec:
           {{- end }}
           {{- if .env }}
           env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 10 }}
+          {{- end }}
+          {{- if .envFrom }}
+          envFrom:
+          {{- range .envFrom }}
+          {{- if .configMapRef }}
+          - configMapRef:
+              name: {{ include "helpers.renderGlobalIfExists" (dict "value" (.configMapRef.name | quote) "global" $global_values) }}
+          {{- end }}
+          {{- if .secretRef }}
+          - secretRef:
+              name: {{ include "helpers.renderGlobalIfExists" (dict "value" (.secretRef.name | quote) "global" $global_values) }}
+          {{- end }}
+          {{- end }}
           {{- end }}
           volumeMounts:
             {{- range .volumeMounts }}
@@ -90,7 +103,7 @@ spec:
       {{- end }}
       containers:
       {{- range .containers }}
-        - name: {{ required "Name is required for each container" .name }}
+        - name: {{ include "helpers.renderGlobalIfExists" (dict "value" (required "Name is required for each container" .name | quote) "global" $global_values) }}
           {{- if .securityContext }}
           securityContext: {{- include "common.tplvalues.render" (dict "value" .securityContext "context" $) | nindent 12 }}
           {{- end }}

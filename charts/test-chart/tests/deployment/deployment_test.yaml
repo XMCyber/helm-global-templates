@@ -136,6 +136,18 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
           value: false
+  
+  - it: should render global values correctly to container name
+    values:
+      - deployment_values.yaml
+    set:
+      global.global-var: rendered
+      deployments.api.containers.api-container.name: "api-container-{{ global.global-var }}"
+    
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: api-container-rendered
 
   - it: should render global values correctly to env vars
     values:

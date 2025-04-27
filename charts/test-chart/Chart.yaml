@@ -8,5 +8,5 @@ dependencies:
     import-values:
       - defaults
   - name: common
-    version: 2.6.0
+    version: 2.27.0
     repository: https://charts.bitnami.com/bitnami

@@ -61,6 +61,15 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].command[0]
           value: "/bin/sh"
+      - equal:
+          path: spec.template.spec.initContainers[0].envFrom[0].configMapRef.name
+          value: init-db-config
+      - equal:
+          path: spec.template.spec.initContainers[0].envFrom[1].secretRef.name
+          value: init-db-secret
+      - equal:
+          path: spec.template.spec.initContainers[0].envFrom[2].configMapRef.name
+          value: init-db-config-rendered
 
   - it: should set volumes and mounts correctly
     values:
