@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   global-templates:
   - apiVersion: v2
+    created: "2025-04-27T22:39:35.134988882Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 2.27.0
+    description: A library chart that provides a set of reusable templates for Helm
+      Charts
+    digest: 191c32bc9cf4d1cf0dbcc1bcd5de94b14d97ab2dae5be26528128efeef9dd87a
+    name: global-templates
+    type: library
+    urls:
+    - https://github.com/XMCyber/helm-global-templates/releases/download/global-templates-1.5.1/global-templates-1.5.1.tgz
+    version: 1.5.1
+  - apiVersion: v2
     created: "2025-04-21T13:15:30.841837556Z"
     dependencies:
     - name: common
@@ -379,4 +393,4 @@ entries:
     urls:
     - https://github.com/XMCyber/helm-global-templates/releases/download/global-templates-1.0.0/global-templates-1.0.0.tgz
     version: 1.0.0
-generated: "2025-04-21T13:15:30.842095577Z"
+generated: "2025-04-27T22:39:35.135238629Z"
