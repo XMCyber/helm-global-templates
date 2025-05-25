@@ -54,6 +54,9 @@ externalsecrets:
           key: example-remote-key
           version: "1"
           property: propertyName
+      youCanAlsoPassAsMap:
+        remoteRef:
+          key: example-map
     dataFrom:
       - extract:
           key: another-remote-key

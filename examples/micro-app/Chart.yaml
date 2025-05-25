@@ -26,6 +26,6 @@ appVersion: "1.16.0"
 dependencies:
   - name: global-templates
     version: "*"
-    repository: https://xmcyber.github.io/helm-global-templates/
+    repository: file://../../charts/global-templates
     import-values:
-      - defaults # This is the default values file for the global-templates chart
+      - defaults
