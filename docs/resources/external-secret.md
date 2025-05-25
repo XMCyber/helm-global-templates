@@ -18,8 +18,8 @@
 | `target.name`                         | string       | Yes      | The name of the target secret. Defaults to the name of the ExternalSecret.                            |
 | `target.creationPolicy`               | string       | No       | The creation policy for the target secret. Defaults to `Owner`.                                       |
 | `target.template`                     | map          | No       | A template for the target secret.                                                                     |
-| `data`                                | List of maps | Yes      | A list of data entries for the ExternalSecret. Each entry specifies a `secretKey` and a `remoteRef`.  |
-| `data[].secretKey`                    | string       | Yes      | The key under which the data will be stored in the target secret.                                     |
+| `data`                                | List of maps or map | Yes      | A list of data entries for the ExternalSecret. Each entry specifies a `secretKey` and a `remoteRef`. Can be provided either as a list of maps or as a map where keys are the secret keys. |
+| `data[].secretKey`                    | string       | Yes      | The key under which the data will be stored in the target secret. When using map format, this is the key in the map. |
 | `data[].remoteRef`                    | map          | Yes      | A reference to the remote secret key.                                                                 |
 | `data[].remoteRef.key`                | string       | Yes      | The key in the remote secret.                                                                         |
 | `data[].remoteRef.version`            | string       | No       | The version of the key in the remote secret.                                                          |
@@ -54,10 +54,32 @@ externalsecrets:
           key: example-remote-key
           version: "1"
           property: propertyName
-      youCanAlsoPassAsMap:
-        remoteRef:
-          key: example-map
-    dataFrom:
-      - extract:
-          key: another-remote-key
 ```
+
+## Example of ExternalSecret with Map Format
+
+```yaml
+externalsecrets:
+  - name: example-externalsecret-map
+    namespace: my-namespace
+    secretStoreRef:
+      name: my-secret-store
+    target:
+      name: example-target-secret
+    data:
+      # Using map format where keys are the secret keys
+      username:
+        remoteRef:
+          key: db-credentials
+          property: username
+      password:
+        remoteRef:
+          key: db-credentials
+          property: password
+      api-key:
+        remoteRef:
+          key: api-credentials
+          version: "2"
+```
+
+Both formats (list and map) are supported and will produce the same result. The map format can be more convenient when you have a large number of keys, or when you want to override the value of a specific key.
