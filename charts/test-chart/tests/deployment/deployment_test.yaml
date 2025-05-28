@@ -96,10 +96,16 @@ tests:
           value: app-config
       - equal:
           path: spec.template.spec.containers[0].volumeMounts[0].name
-          value: config-volume
+          value: config-volume-rendered
       - equal:
           path: spec.template.spec.containers[0].volumeMounts[0].mountPath
-          value: /config
+          value: /config-rendered
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].name
+          value: config-volume-rendered
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
+          value: /config-rendered
 
   - it: should set projected volumes correctly
     values:
@@ -107,16 +113,16 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.volumes[1].name
-          value: projected-volume
+          value: projected-volume-rendered
       - equal:
           path: spec.template.spec.volumes[1].projected.sources[0].secret.name
-          value: mysecret
+          value: mysecret-rendered
       - equal:
           path: spec.template.spec.volumes[1].projected.sources[0].secret.items[0].key
-          value: username
+          value: username-rendered
       - equal:
           path: spec.template.spec.volumes[1].projected.sources[0].secret.items[0].path
-          value: my-group/my-username
+          value: my-group/my-username-rendered
 
   - it: should set affinity rules correctly
     values:

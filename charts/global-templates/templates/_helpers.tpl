@@ -277,3 +277,49 @@ Parameters:
   {{- $result -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+A helper function to recursively process values and replace global placeholders.
+This function preserves the structure of the input YAML.
+Important - it rerturns a YAML formatted string.
+
+Parameters:
+- dict:
+  - "value": The value to process
+  - "global": The global values object
+
+Usage example:
+volumes:
+{{- include "helpers.renderGlobalRecursive" (dict "value" .volumes "global" $global_values) | nindent 8 }}
+*/}}
+
+{{- define "helpers.renderGlobalRecursive" -}}
+{{- $global := .global | default dict -}}
+{{- $value := .value -}}
+{{- $indent := .indent | default 0 -}}
+
+{{- /* Handle nil values */ -}}
+{{- if eq $value nil -}}
+null
+{{- /* Handle maps/dictionaries */ -}}
+{{- else if kindIs "map" $value -}}
+{{- range $key, $val := $value }}
+{{ if gt $indent 0 }}{{ repeat (int $indent) " " }}{{ end }}{{ $key }}:{{ if or (kindIs "map" $val) (kindIs "slice" $val) }}
+{{ include "helpers.renderGlobalRecursive" (dict "value" $val "global" $global "indent" (add $indent 2)) }}
+{{- else }} {{ include "helpers.renderGlobalRecursive" (dict "value" $val "global" $global) }}{{ end }}
+{{- end }}
+{{- /* Handle arrays/slices */ -}}
+{{- else if kindIs "slice" $value -}}
+{{- range $index, $item := $value }}
+{{ if gt $indent 0 }}{{ repeat (int $indent) " " }}{{ end }}- {{ if or (kindIs "map" $item) (kindIs "slice" $item) }}
+{{ include "helpers.renderGlobalRecursive" (dict "value" $item "global" $global "indent" (add $indent 2)) }}
+{{- else }}{{ include "helpers.renderGlobalRecursive" (dict "value" $item "global" $global) }}{{ end }}
+{{- end }}
+{{- /* Handle strings with global variables */ -}}
+{{- else if kindIs "string" $value -}}
+{{ include "helpers.renderGlobalIfExists" (dict "value" $value "global" $global) }}
+{{- /* Handle all other types */ -}}
+{{- else -}}
+{{ $value }}
+{{- end -}}
+{{- end -}}
