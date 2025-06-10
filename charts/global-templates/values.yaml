@@ -37,6 +37,9 @@ exports:
       remoteRef:
         conversionStrategy: Default
         metadataPolicy: None
+      extract:
+        conversionStrategy: Default
+        metadataPolicy: None
 
     clusterexternalsecret_defaults:
       refreshTime: "1m"

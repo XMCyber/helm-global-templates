@@ -138,10 +138,10 @@ spec:
           volumeMounts:
           {{- if (kindIs "map" .volumeMounts) }}
             {{- range $key, $value := .volumeMounts }}
-            - name: {{ $value.name }}
-              mountPath: {{ $value.mountPath }}
+            - name: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.name) "global" $global_values) }}
+              mountPath: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.mountPath) "global" $global_values) }}
               {{- if $value.subPath }}
-              subPath: {{ $value.subPath }}
+              subPath: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.subPath) "global" $global_values) }}
               {{- end }}
               {{- if $value.readOnly }}
               readOnly: {{ $value.readOnly }}
@@ -171,17 +171,17 @@ spec:
       volumes:
       {{- if (kindIs "map" .volumes) }}
         {{- range $key, $value := .volumes }}
-        - name: {{ $value.name }}
+        - name: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.name) "global" $global_values) }}
           {{- if $value.secret }}
           secret:
-            secretName: {{ $value.secret.secretName }}
+            secretName: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.secret.secretName) "global" $global_values) }}
           {{- end }}
           {{- if $value.projected }}
           projected: {{- include "common.tplvalues.render" (dict "value" $value.projected "context" $) | nindent 14 }}
           {{- end }}
           {{- if $value.configMap }}
           configMap:
-            name: {{ $value.configMap.name }}
+            name: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.configMap.name) "global" $global_values) }}
             {{- if $value.configMap.defaultMode }}
             defaultMode: {{ $value.configMap.defaultMode }}
             {{- end }}
