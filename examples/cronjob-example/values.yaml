@@ -1,0 +1,170 @@
+global:
+  registry: docker.io
+  organization: my-company
+
+# Example CronJob configurations
+cronjobs:
+  # Daily backup job
+  daily-backup:
+    name: daily-backup
+    namespace: production
+    schedule: "0 2 * * *"  # Every day at 2 AM
+    timeZone: "UTC"
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: 5
+    failedJobsHistoryLimit: 3
+    backoffLimit: 3
+    activeDeadlineSeconds: 3600  # 1 hour timeout
+    restartPolicy: OnFailure
+    containers:
+      - name: backup
+        image:
+          registry: docker.io
+          repository: postgres
+          tag: "14-alpine"
+        command:
+          - /bin/sh
+          - -c
+          - |
+            echo "Starting database backup..."
+            pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME > /backup/backup-$(date +%Y%m%d-%H%M%S).sql
+            echo "Backup completed successfully"
+        env:
+          DB_HOST: "postgres-service"
+          DB_NAME: "myapp"
+          DB_USER: "backup_user"
+        envFrom:
+          - secretRef:
+              name: backup-credentials
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+          backup-storage:
+            name: backup-storage
+            mountPath: /backup
+    volumes:
+      backup-storage:
+        name: backup-storage
+        configMap:
+          name: backup-config
+          items:
+            - key: config.yaml
+              path: config.yaml
+    annotations:
+      description: "Daily database backup job"
+    labels:
+      app.kubernetes.io/component: "backup"
+      backup-type: "database"
+    podAnnotations:
+      prometheus.io/scrape: "false"
+    podLabels:
+      backup-retention: "30d"
+
+  # Weekly cleanup job
+  weekly-cleanup:
+    name: weekly-cleanup
+    namespace: production
+    schedule: "0 0 * * 0"  # Every Sunday at midnight
+    timeZone: "UTC"
+    concurrencyPolicy: Replace
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 1
+    containers:
+      - name: cleanup
+        image:
+          registry: docker.io
+          repository: busybox
+          tag: "1.35.0"
+        command:
+          - /bin/sh
+          - -c
+          - |
+            echo "Starting cleanup..."
+            # Clean up old files
+            find /data -name "*.tmp" -mtime +7 -delete
+            find /data -name "*.log" -mtime +30 -delete
+            echo "Cleanup completed"
+        env:
+          CLEANUP_PATH: "/data"
+          LOG_LEVEL: "INFO"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        volumeMounts:
+          data-volume:
+            name: data-volume
+            mountPath: /data
+    volumes:
+      data-volume:
+        name: data-volume
+        configMap:
+          name: cleanup-config
+    annotations:
+      description: "Weekly cleanup job"
+    labels:
+      app.kubernetes.io/component: "cleanup"
+
+  # Monthly report generation
+  monthly-report:
+    name: monthly-report
+    namespace: production
+    schedule: "0 6 1 * *"  # First day of each month at 6 AM
+    timeZone: "America/New_York"
+    concurrencyPolicy: Forbid
+    ttlSecondsAfterFinished: 86400  # Clean up after 1 day
+    containers:
+      - name: report-generator
+        image:
+          registry: docker.io
+          repository: python
+          tag: "3.11-slim"
+        command:
+          - python
+          - -c
+          - |
+            import datetime
+            print(f"Generating monthly report for {datetime.datetime.now().strftime('%B %Y')}")
+            # Report generation logic would go here
+            print("Report generation completed")
+        env:
+          REPORT_TYPE: "monthly"
+          OUTPUT_FORMAT: "pdf"
+        envFrom:
+          - configMapRef:
+              name: report-config
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+    annotations:
+      description: "Monthly report generation"
+    labels:
+      app.kubernetes.io/component: "reporting"
+
+  # Disabled job (example of how to disable)
+  disabled-job:
+    name: disabled-job
+    namespace: production
+    schedule: "0 * * * *"  # Every hour
+    disabled: true  # This job will not be created
+    containers:
+      - name: example
+        image:
+          registry: docker.io
+          repository: busybox
+          tag: "1.35.0"
+        command:
+          - echo
+          - "This job is disabled"

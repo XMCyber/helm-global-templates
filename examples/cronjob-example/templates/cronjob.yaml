@@ -1,0 +1,1 @@
+{{ include "global-templates.cronjob" (dict "cronjobs" .Values.cronjobs "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Files" .Files "Template" .Template "Values" .Values) }}

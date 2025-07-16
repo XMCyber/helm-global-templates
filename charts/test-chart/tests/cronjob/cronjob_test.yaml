@@ -1,0 +1,234 @@
+suite: Test cronjob template
+templates:
+  - template.yaml
+  
+tests:
+  - it: should create basic cronjob correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: kind
+          value: CronJob
+      - equal:
+          path: apiVersion
+          value: batch/v1
+      - equal:
+          path: metadata.name
+          value: backup-job
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - equal:
+          path: metadata.labels.app
+          value: backup-job
+
+  - it: should set cronjob schedule correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.schedule
+          value: "0 2 * * *"
+      - equal:
+          path: spec.timeZone
+          value: "UTC"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+
+  - it: should set job history limits correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 5
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 3
+
+  - it: should set job template spec correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 3
+      - equal:
+          path: spec.jobTemplate.spec.activeDeadlineSeconds
+          value: 3600
+
+  - it: should set pod template spec correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: OnFailure
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].name
+          value: backup
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: docker.io/busybox:1.35.0
+
+  - it: should set container environment variables correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: BACKUP_PATH
+            value: "/data/backup"
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: LOG_LEVEL
+            value: "INFO"
+
+  - it: should set container envFrom correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: backup-config
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom
+          content:
+            secretRef:
+              name: backup-secret
+
+  - it: should set container resources correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 128Mi
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
+          value: 512Mi
+
+  - it: should set volume mounts correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts
+          content:
+            name: backup-volume
+            mountPath: /data/backup
+
+  - it: should set volumes correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: backup-volume
+            configMap:
+              name: backup-config
+              items:
+                - key: config.yaml
+                  path: config.yaml
+
+  - it: should set metadata annotations correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations["example.com/managed-by"]
+          value: "helm"
+
+  - it: should set metadata labels correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: "backup"
+
+  - it: should set pod annotations correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.annotations["prometheus.io/scrape"]
+          value: "false"
+
+  - it: should set pod labels correctly
+    values:
+      - cronjob_values.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.labels["backup-type"]
+          value: "database"
+
+  - it: should use default values when not specified
+    values:
+      - cronjob_values.yaml
+    set:
+      cronjobs.backup-job.concurrencyPolicy: null
+      cronjobs.backup-job.successfulJobsHistoryLimit: null
+      cronjobs.backup-job.failedJobsHistoryLimit: null
+      cronjobs.backup-job.backoffLimit: null
+      cronjobs.backup-job.restartPolicy: null
+    asserts:
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 3
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 1
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 6
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: OnFailure
+
+  - it: should handle disabled cronjobs
+    values:
+      - cronjob_values.yaml
+    set:
+      cronjobs.backup-job.disabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should handle multiple cronjobs
+    values:
+      - cronjob_values.yaml
+    set:
+      cronjobs.cleanup-job:
+        name: cleanup-job
+        namespace: test-namespace
+        schedule: "0 0 * * 0"
+        containers:
+          - name: cleanup
+            image:
+              registry: docker.io
+              repository: busybox
+              tag: 1.35.0
+            command: 
+              - /bin/sh
+              - -c
+              - "echo 'Running cleanup...'"
+    asserts:
+      - hasDocuments:
+          count: 2
