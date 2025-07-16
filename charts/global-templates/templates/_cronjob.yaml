@@ -26,24 +26,12 @@ spec:
   {{- if .timeZone }}
   timeZone: {{ .timeZone | quote }}
   {{- end }}
-  {{- if .concurrencyPolicy }}
-  concurrencyPolicy: {{ .concurrencyPolicy }}
-  {{- else }}
-  concurrencyPolicy: {{ $default_values.concurrencyPolicy | default "Forbid" }}
-  {{- end }}
+  concurrencyPolicy: {{ .concurrencyPolicy | default $default_values.concurrencyPolicy | default "Forbid" }}
   {{- if .suspend }}
   suspend: {{ .suspend }}
   {{- end }}
-  {{- if .successfulJobsHistoryLimit }}
-  successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit }}
-  {{- else }}
-  successfulJobsHistoryLimit: {{ $default_values.successfulJobsHistoryLimit | default 3 }}
-  {{- end }}
-  {{- if .failedJobsHistoryLimit }}
-  failedJobsHistoryLimit: {{ .failedJobsHistoryLimit }}
-  {{- else }}
-  failedJobsHistoryLimit: {{ $default_values.failedJobsHistoryLimit | default 1 }}
-  {{- end }}
+  successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit | default $default_values.successfulJobsHistoryLimit | default 3 }}
+  failedJobsHistoryLimit: {{ .failedJobsHistoryLimit | default $default_values.failedJobsHistoryLimit | default 1 }}
   {{- if .startingDeadlineSeconds }}
   startingDeadlineSeconds: {{ .startingDeadlineSeconds }}
   {{- end }}
@@ -52,11 +40,7 @@ spec:
       {{- if .activeDeadlineSeconds }}
       activeDeadlineSeconds: {{ .activeDeadlineSeconds }}
       {{- end }}
-      {{- if .backoffLimit }}
-      backoffLimit: {{ .backoffLimit }}
-      {{- else }}
-      backoffLimit: {{ $default_values.backoffLimit | default 6 }}
-      {{- end }}
+      backoffLimit: {{ .backoffLimit | default $default_values.backoffLimit | default 6 }}
       {{- if .completions }}
       completions: {{ .completions }}
       {{- end }}
@@ -81,11 +65,7 @@ spec:
             {{- include "common.tplvalues.render" (dict "value" .podLabels "context" $) | nindent 12 }}
             {{- end }}
         spec:
-          {{- if .restartPolicy }}
-          restartPolicy: {{ .restartPolicy }}
-          {{- else }}
-          restartPolicy: {{ $default_values.restartPolicy | default "OnFailure" }}
-          {{- end }}
+          restartPolicy: {{ .restartPolicy | default $default_values.restartPolicy | default "OnFailure" }}
           {{- if .serviceAccountName }}
           serviceAccountName: {{ include "helpers.renderGlobalIfExists" (dict "value" .serviceAccountName "global" $global_values) }}
           {{- else if $default_values.serviceAccountName }}
