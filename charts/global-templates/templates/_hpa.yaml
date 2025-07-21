@@ -43,7 +43,9 @@ spec:
         type: AverageValue
         averageValue: {{ .targetMemoryUtilizationPercentage | default $default_values.targetMemoryUtilizationPercentage }}
   {{- end }}
+  {{- if .extraMetrics }}
   {{- toYaml .extraMetrics | nindent 2 }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

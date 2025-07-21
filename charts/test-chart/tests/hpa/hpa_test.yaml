@@ -59,7 +59,34 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
-  
+
+  - it: should work with default values
+    set:
+      hpas:
+        app-hpa:
+          name: app-hpa
+          namespace: test-namespace
+          targetName: target
+    asserts:
+      - equal:
+          path: metadata.name
+          value: app-hpa
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - equal:
+          path: spec.minReplicas
+          value: 3
+      - equal:
+          path: spec.maxReplicas
+          value: 30
+      - equal:
+          path: spec.metrics[0].type
+          value: Resource
+      - equal:
+          path: spec.metrics[0].resource.name
+          value: cpu
+
   - it: should set metrics correctly
     values:
       - hpa_values.yaml
