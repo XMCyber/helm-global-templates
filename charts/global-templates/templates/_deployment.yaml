@@ -175,7 +175,16 @@ spec:
           {{- if $value.secret }}
           secret:
             secretName: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.secret.secretName) "global" $global_values) }}
-          {{- end }}
+            {{- if $value.secret.items }}
+            items:
+              {{- range $value.secret.items }}
+              - key: {{ .key }}
+                {{- if .path }}
+                path: {{ .path }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }} 
           {{- if $value.projected }}
           projected: {{- include "common.tplvalues.render" (dict "value" $value.projected "context" $) | nindent 14 }}
           {{- end }}

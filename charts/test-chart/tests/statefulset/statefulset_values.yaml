@@ -104,6 +104,20 @@ statefulsets:
               items:
                 - key: username
                   path: my-group/my-username
+      secret-volume:
+        name: secret-volume
+        secret:
+          secretName: my-secret
+          items:
+            - key: config.yml
+              path: config.yml
+            - key: data.json
+              path: data.json
+            - key: no-path-key
+      secret-volume-no-items:
+        name: secret-volume-no-items
+        secret:
+          secretName: my-secret-no-items
     securityContext:
       runAsNonRoot: true
     serviceAccountName: api-sa

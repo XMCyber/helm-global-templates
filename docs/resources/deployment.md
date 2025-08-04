@@ -69,6 +69,7 @@
 | `volumes[].projected`             | map                 | No       | Projected volume configuration.                |
 | `volumes[].secret`                | map                 | No       | Secret configuration.                          |
 | `volumes[].secret.secretName`     | string              | Yes      | The name of the secret.                        |
+| `volumes[].secret.items`          | List of maps        | No       | Key-path pairs from the secret.                |
 | `volumes[].configMap`             | map                 | No       | ConfigMap configuration.                       |
 | `volumes[].configMap.name`        | string              | Yes      | The name of the ConfigMap.                     |
 | `volumes[].configMap.defaultMode` | integer             | No       | Default mode for items in the ConfigMap.       |

@@ -6,7 +6,7 @@
 | --------------------------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
 | `statefulsets`                    | List of maps        | Yes      | A list containing StatefulSet configurations. Each item in the list defines a StatefulSet.                    |
 | `name`                            | string              | Yes      | The name of the StatefulSet. If not provided, the `fullname` helper function will be used to generate a name. |
-| `disabled`                         | boolean             | No       | If true, disables the StatefulSet.                                                                            |
+| `disabled`                        | boolean             | No       | If true, disables the StatefulSet.                                                                            |
 | `namespace`                       | string              | Yes      | The namespace in which the StatefulSet should be created.                                                     |
 | `labels`                          | map                 | No       | Custom labels for the StatefulSet.                                                                            |
 | `annotations`                     | map                 | No       | Annotations for the StatefulSet metadata.                                                                     |
@@ -43,6 +43,7 @@
 | `volumes[].projected`             | map                 | No       | Projected volume configuration.                                                                               |
 | `volumes[].secret`                | map                 | No       | Secret configuration.                                                                                         |
 | `volumes[].secret.secretName`     | string              | Yes      | The name of the secret.                                                                                       |
+| `volumes[].secret.items`          | List of maps        | No       | Key-path pairs from the secret.                                                                               |
 | `volumes[].configMap`             | map                 | No       | ConfigMap configuration.                                                                                      |
 | `volumes[].configMap.name`        | string              | Yes      | The name of the ConfigMap.                                                                                    |
 | `volumes[].configMap.defaultMode` | integer             | No       | Default mode for items in the ConfigMap.                                                                      |

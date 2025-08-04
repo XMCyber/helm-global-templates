@@ -172,14 +172,23 @@ spec:
         - name: {{ $value.name }}
           {{- if $value.secret }}
           secret:
-            secretName: {{ $value.secret.secretName }}
-          {{- end }}
+            secretName: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.secret.secretName) "global" $global_values) }}
+            {{- if $value.secret.items }}
+            items:
+              {{- range $value.secret.items }}
+              - key: {{ .key }}
+                {{- if .path }}
+                path: {{ .path }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+          {{- end }} 
           {{- if $value.projected }}
           projected: {{- include "common.tplvalues.render" (dict "value" $value.projected "context" $) | nindent 14 }}
           {{- end }}
           {{- if $value.configMap }}
           configMap:
-            name: {{ $value.configMap.name }}
+            name: {{ include "helpers.renderGlobalIfExists" (dict "value" ($value.configMap.name) "global" $global_values) }}
             {{- if $value.configMap.defaultMode }}
             defaultMode: {{ $value.configMap.defaultMode }}
             {{- end }}

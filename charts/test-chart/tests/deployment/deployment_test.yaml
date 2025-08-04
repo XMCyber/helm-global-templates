@@ -261,6 +261,47 @@ tests:
           path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
           value: 5
 
+  - it: should set secret volume with items correctly
+    values:
+      - deployment_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[2].name
+          value: secret-volume
+      - equal:
+          path: spec.template.spec.volumes[2].secret.secretName
+          value: my-secret
+      - equal:
+          path: spec.template.spec.volumes[2].secret.items[0].key
+          value: config.yml
+      - equal:
+          path: spec.template.spec.volumes[2].secret.items[0].path
+          value: config.yml
+      - equal:
+          path: spec.template.spec.volumes[2].secret.items[1].key
+          value: data.json
+      - equal:
+          path: spec.template.spec.volumes[2].secret.items[1].path
+          value: data.json
+      - equal:
+          path: spec.template.spec.volumes[2].secret.items[2].key
+          value: no-path-key
+      - notExists:
+          path: spec.template.spec.volumes[2].secret.items[2].path
+
+  - it: should set secret volume without items correctly
+    values:
+      - deployment_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[3].name
+          value: secret-volume-no-items
+      - equal:
+          path: spec.template.spec.volumes[3].secret.secretName
+          value: my-secret-no-items
+      - notExists:
+          path: spec.template.spec.volumes[3].secret.items
+
   - it: should render global values correctly to image pull policy
     values:
       - deployment_values.yaml
