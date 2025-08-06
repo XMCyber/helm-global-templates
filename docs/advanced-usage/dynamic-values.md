@@ -10,20 +10,7 @@ We solved this problem by using a `dynamic-values`, basically a utilily function
 
 The syntax for injecting a global value is `{{ global.path_to_value }}`, you can also use nested values like `{{ global.path.to.value }}`.
 
-> Note: You can't use dynamic-values in any resource, here is a list of properties and resources that support dynamic-values:
->
-> - env values in containers (deployments, statefulsets, etc.)
-> - namespaces name in all resources
-> - `clusterexternalsecrets.data[].remoteRef.key`
-> - `clustersecretstores.name`
-> - `clustersecretstores.aws.region`
-> - `externalsecrets.secretStoreRef.name`
-> - `externalsecrets.data[].remoteRef.key`
-> - `ingresses.rules[].host`
-> - `scaledobjects.triggers[].metadata{}`
-> - `configmaps.data`
->
-> If you want to use dynamic-values in other resources, please open an issue and we will add support for it.
+> Note: You can't use dynamic-values in any resource, if the resource or property is not supported, open an issue or a pull request to add support for it.
 
 ### Example
 

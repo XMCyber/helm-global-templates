@@ -243,3 +243,62 @@ tests:
           value: my-secret-no-items
       - notExists:
           path: spec.template.spec.volumes[3].secret.items
+
+  - it: should render global values correctly in volumeMounts for containers
+    values:
+      - statefulset_values.yaml
+    set:
+      global:
+        volume-prefix: global-vol
+        mount-base: /global/mount
+        sub-path: global-config
+      statefulsets.my-statefulset.containers.api-container.volumeMounts:
+        config-volume:
+          name: "{{ global.volume-prefix }}-config"
+          mountPath: "{{ global.mount-base }}/config"
+          subPath: "{{ global.sub-path }}/app.conf"
+    
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          value: global-vol-config
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /global/mount/config
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].subPath
+          value: global-config/app.conf
+
+  - it: should render global values correctly in volumeMounts for initContainers
+    values:
+      - statefulset_values.yaml
+    set:
+      global:
+        init-volume: init-vol
+        init-mount: /init/mount
+        init-subpath: init-config
+      statefulsets.my-statefulset.initContainers:
+        - name: init-db
+          image:
+            registry: docker.io
+            repository: busybox
+            tag: 1.0.0
+          command: 
+            - "/bin/sh"
+            - -c
+            - "echo 'db initialized'"
+          volumeMounts:
+            - name: "{{ global.init-volume }}-data"
+              mountPath: "{{ global.init-mount }}/data"
+              subPath: "{{ global.init-subpath }}/init.conf"
+    
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].name
+          value: init-vol-data
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
+          value: /init/mount/data
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].subPath
+          value: init-config/init.conf

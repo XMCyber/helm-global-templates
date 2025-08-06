@@ -78,17 +78,19 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
+          {{- if .volumeMounts }}
           volumeMounts:
             {{- range .volumeMounts }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
+            - name: {{ include "helpers.renderGlobalIfExists" (dict "value" (.name) "global" $global_values) }}
+              mountPath: {{ include "helpers.renderGlobalIfExists" (dict "value" (.mountPath) "global" $global_values) }}
               {{- if .subPath }}
-              subPath: {{ .subPath }}
+              subPath: {{ include "helpers.renderGlobalIfExists" (dict "value" (.subPath) "global" $global_values) }}
               {{- end }}
               {{- if .readOnly }}
               readOnly: {{ .readOnly }}
               {{- end }}
             {{- end }}
+          {{- end }}
           {{- if .resources }}
           resources: {{ .resources | toYaml | nindent 12 }}
           {{- end }}

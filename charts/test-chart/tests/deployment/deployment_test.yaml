@@ -317,3 +317,52 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].imagePullPolicy
           value: Never
+
+  - it: should render global values correctly in volumeMounts for containers
+    values:
+      - deployment_values.yaml
+    set:
+      global:
+        volume-prefix: global-vol
+        mount-base: /global/mount
+        sub-path: global-config
+      deployments.api.containers.api-container.volumeMounts:
+        config-volume:
+          name: "{{ global.volume-prefix }}-config"
+          mountPath: "{{ global.mount-base }}/config"
+          subPath: "{{ global.sub-path }}/app.conf"
+    
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          value: global-vol-config
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /global/mount/config
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].subPath
+          value: global-config/app.conf
+
+  - it: should render global values correctly in volumeMounts for initContainers
+    values:
+      - deployment_values.yaml
+    set:
+      global:
+        init-volume: init-vol
+        init-mount: /init/mount
+        init-subpath: init-config
+      deployments.api.initContainers.init-db.volumeMounts:
+        - name: "{{ global.init-volume }}-data"
+          mountPath: "{{ global.init-mount }}/data"
+          subPath: "{{ global.init-subpath }}/init.conf"
+    
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].name
+          value: init-vol-data
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
+          value: /init/mount/data
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].subPath
+          value: init-config/init.conf
