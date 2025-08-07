@@ -302,3 +302,13 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].volumeMounts[0].subPath
           value: init-config/init.conf
+
+  - it: should allow replicas to be set to 0
+    values:
+      - statefulset_values.yaml
+    set:
+      statefulsets.my-statefulset.replicas: 0
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0

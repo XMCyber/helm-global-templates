@@ -22,7 +22,7 @@ metadata:
   annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations "reloaderEnabled" .reloaderEnabled) | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .replicas (not $default_values.autoscaling.enabled) }}
+  {{- if and (not (eq .replicas nil)) (not $default_values.autoscaling.enabled) }}
   replicas: {{ .replicas }}
   {{- end }}
   {{- if .revisionHistoryLimit }}

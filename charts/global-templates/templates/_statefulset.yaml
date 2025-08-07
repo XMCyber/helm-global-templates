@@ -21,7 +21,7 @@ metadata:
   {{- end }}
 spec:
   serviceName: {{ .name | default (include "common.names.fullname" $) }}
-  {{- if and .replicas (not $default_values.autoscaling.enabled) }}
+  {{- if and (not (eq .replicas nil)) (not $default_values.autoscaling.enabled) }}
   replicas: {{ .replicas }}
   {{- end}}
   {{- if .revisionHistoryLimit }}
