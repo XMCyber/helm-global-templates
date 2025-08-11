@@ -32,16 +32,16 @@ spec:
     resource:
       name: cpu
       target:
-        type: AverageValue
-        averageValue: {{ .targetCPUUtilizationPercentage | default $default_values.targetCPUUtilizationPercentage }}
+        type: Utilization
+        averageUtilization: {{ .targetCPUUtilizationPercentage | default $default_values.targetCPUUtilizationPercentage }}
   {{- end}}
   {{- if or .targetMemoryUtilizationPercentage $default_values.targetMemoryUtilizationPercentage}}
   - type: Resource
     resource:
       name: memory
       target:
-        type: AverageValue
-        averageValue: {{ .targetMemoryUtilizationPercentage | default $default_values.targetMemoryUtilizationPercentage }}
+        type: Utilization
+        averageUtilization: {{ .targetMemoryUtilizationPercentage | default $default_values.targetMemoryUtilizationPercentage }}
   {{- end }}
   {{- if .extraMetrics }}
   {{- toYaml .extraMetrics | nindent 2 }}
