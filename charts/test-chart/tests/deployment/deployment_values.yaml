@@ -139,3 +139,12 @@ deployments:
                   values:
                     - e2e-az1
                     - e2e-az2
+    hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+          - "localhost"
+          - "api.local"
+      - ip: "{{ global.db-ip }}"
+        hostnames:
+          - "{{ global.db-hostname }}"
+          - "database.{{ global.domain }}"

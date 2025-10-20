@@ -208,7 +208,14 @@ spec:
       {{- end }}
       {{- end }}
       {{- if .hostAliases }}
-      hostAliases: {{- include "common.tplvalues.render" (dict "value" .hostAliases "context" $) | nindent 8 }}
+      hostAliases:
+      {{- range .hostAliases }}
+        - ip: {{ include "helpers.renderGlobalIfExists" (dict "value" (required "IP is required for each hostAlias" .ip | quote) "global" $global_values) }}
+          hostnames:
+          {{- range .hostnames }}
+          - {{ include "helpers.renderGlobalIfExists" (dict "value" (. | quote) "global" $global_values) }}
+          {{- end }}
+      {{- end }}
       {{- end }}
       {{- if .affinity }}
       affinity: {{- include "common.tplvalues.render" ( dict "value" .affinity "context" $) | nindent 8 }}
