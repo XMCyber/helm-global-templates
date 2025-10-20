@@ -47,7 +47,9 @@
 | `volumes[].configMap`             | map                 | No       | ConfigMap configuration.                                                                                      |
 | `volumes[].configMap.name`        | string              | Yes      | The name of the ConfigMap.                                                                                    |
 | `volumes[].configMap.defaultMode` | integer             | No       | Default mode for items in the ConfigMap.                                                                      |
-| `hostAliases`                     | List of maps        | No       | Custom host file entries.                                                                                     |
+| `hostAliases`                     | List of maps        | No       | Custom host file entries. Supports global value rendering.                                                    |
+| `hostAliases[].ip`                | string              | Yes      | IP address for the host alias.                                                                                |
+| `hostAliases[].hostnames`         | List of strings     | Yes      | List of hostnames that resolve to the IP.                                                                     |
 | `affinity`                        | object              | No       | Affinity rules for scheduling the pods.                                                                       |
 | `nodeSelector`                    | map                 | No       | Node selection criteria.                                                                                      |
 | `tolerations`                     | List of maps        | No       | Tolerations for pod scheduling.                                                                               |

@@ -376,3 +376,45 @@ tests:
       - equal:
           path: spec.replicas
           value: 0
+
+  - it: should set hostAliases correctly
+    values:
+      - deployment_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.hostAliases[0].ip
+          value: "127.0.0.1"
+      - equal:
+          path: spec.template.spec.hostAliases[0].hostnames[0]
+          value: "localhost"
+      - equal:
+          path: spec.template.spec.hostAliases[0].hostnames[1]
+          value: "api.local"
+
+  - it: should render global values in hostAliases correctly
+    values:
+      - deployment_values.yaml
+    set:
+      global:
+        db-ip: "192.168.1.100"
+        db-hostname: "database.example.com"
+        domain: "example.com"
+    asserts:
+      - equal:
+          path: spec.template.spec.hostAliases[1].ip
+          value: "192.168.1.100"
+      - equal:
+          path: spec.template.spec.hostAliases[1].hostnames[0]
+          value: "database.example.com"
+      - equal:
+          path: spec.template.spec.hostAliases[1].hostnames[1]
+          value: "database.example.com"
+
+  - it: should not render hostAliases if not specified
+    values:
+      - deployment_values.yaml
+    set:
+      deployments.api.hostAliases: null
+    asserts:
+      - notExists:
+          path: spec.template.spec.hostAliases

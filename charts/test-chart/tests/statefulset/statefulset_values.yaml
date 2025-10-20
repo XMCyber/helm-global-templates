@@ -138,6 +138,15 @@ statefulsets:
                   values:
                     - e2e-az1
                     - e2e-az2
+    hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+          - "localhost"
+          - "stateful.local"
+      - ip: "{{ global.cache-ip }}"
+        hostnames:
+          - "{{ global.cache-hostname }}"
+          - "cache.{{ global.domain }}"
     volumeClaimTemplates:
       - metadata:
           name: my-pvc
