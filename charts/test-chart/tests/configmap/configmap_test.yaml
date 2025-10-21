@@ -136,3 +136,61 @@ tests:
       - equal:
           path: data.nested_number
           value: "22"
+
+  - it: should render global placeholders in annotations
+    values:
+      - configmap_values.yaml
+    set:
+      global:
+        datacenter: "dc-east-1"
+        environment: "development"
+        config:
+          version: "3.2.1"
+          owner: "platform-team"
+      configmaps.app-config.annotations:
+        configmap.datacenter: "{{global.datacenter}}"
+        configmap.environment: "{{global.environment}}"
+        configmap.config-version: "{{global.config.version}}"
+        configmap.owner: "{{global.config.owner}}"
+        configmap.full-info: "{{global.config.owner}} manages v{{global.config.version}} in {{global.environment}}"
+    asserts:
+      - equal:
+          path: metadata.annotations["configmap.datacenter"]
+          value: dc-east-1
+      - equal:
+          path: metadata.annotations["configmap.environment"]
+          value: development
+      - equal:
+          path: metadata.annotations["configmap.config-version"]
+          value: "3.2.1"
+      - equal:
+          path: metadata.annotations["configmap.owner"]
+          value: platform-team
+      - equal:
+          path: metadata.annotations["configmap.full-info"]
+          value: "platform-team manages v3.2.1 in development"
+
+  - it: should preserve complex normal annotations
+    values:
+      - configmap_values.yaml
+    set:
+      configmaps.app-config.annotations:
+        kubectl.kubernetes.io/last-applied-configuration: |
+          {"apiVersion":"v1","kind":"ConfigMap","metadata":{"annotations":{}}}
+        config.alpha.kubernetes.io/annotation: "alpha-feature"
+        custom.json: '{"key": "value", "nested": {"inner": "data"}}'
+        url.pattern: "https://example.com/api/v1/{id}?param=unrelated"
+    asserts:
+      - equal:
+          path: metadata.annotations["kubectl.kubernetes.io/last-applied-configuration"]
+          value: |
+            {"apiVersion":"v1","kind":"ConfigMap","metadata":{"annotations":{}}}
+      - equal:
+          path: metadata.annotations["config.alpha.kubernetes.io/annotation"]
+          value: "alpha-feature"
+      - equal:
+          path: metadata.annotations["custom.json"]
+          value: '{"key": "value", "nested": {"inner": "data"}}'
+      - equal:
+          path: metadata.annotations["url.pattern"]
+          value: "https://example.com/api/v1/{id}?param=unrelated"

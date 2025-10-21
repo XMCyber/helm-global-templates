@@ -144,7 +144,18 @@ Author: Devops Infra Team
 {{- if .reloaderEnabled }}
 {{- $combinedAnnotations := merge $combinedAnnotations (dict "reloader.stakater.com/auto" "true") }}
 {{- end }}
-{{- include "common.tplvalues.render" (dict "value" $combinedAnnotations "context" .context) }}
+{{- /* Apply global render to annotation values first, then template render */ -}}
+{{- $globalValues := .context.Values.global | default dict }}
+{{- $globalRenderedAnnotations := dict }}
+{{- range $key, $value := $combinedAnnotations }}
+  {{- if kindIs "string" $value }}
+    {{- $renderedValue := include "helpers.renderGlobalIfExists" (dict "value" $value "global" $globalValues) }}
+    {{- $globalRenderedAnnotations = set $globalRenderedAnnotations $key $renderedValue }}
+  {{- else }}
+    {{- $globalRenderedAnnotations = set $globalRenderedAnnotations $key $value }}
+  {{- end }}
+{{- end }}
+{{- include "common.tplvalues.render" (dict "value" $globalRenderedAnnotations "context" .context) }}
 {{- end }}
 
 {{/*
@@ -266,10 +277,10 @@ Parameters:
       {{- end -}}
     {{- end -}}
     
-    {{- /* Replace placeholder with value if path is valid and value is a string */ -}}
+    {{- /* Replace placeholder with value if path is valid */ -}}
     {{- if and $valid (kindIs "string" $current) -}}
       {{- $result = replace $placeholder $current $result -}}
-    {{- else if and $valid (or (kindIs "int" $current) (kindIs "float64" $current)) -}}
+    {{- else if and $valid (or (kindIs "int" $current) (kindIs "float64" $current) (kindIs "bool" $current)) -}}
       {{- $result = replace $placeholder (printf "%v" $current) $result -}}
     {{- end -}}
   {{- end -}}

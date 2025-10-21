@@ -232,3 +232,42 @@ tests:
     asserts:
       - hasDocuments:
           count: 2
+
+  - it: should render global placeholders in annotations
+    values:
+      - cronjob_values.yaml
+    set:
+      global:
+        backup:
+          retention: "30d"
+          storage: "s3-backup"
+        schedule:
+          timezone: "UTC"
+        notifications:
+          slack: "backup-alerts"
+      cronjobs.backup-job.annotations:
+        cronjob.retention: "{{global.backup.retention}}"
+        cronjob.storage: "{{global.backup.storage}}"
+        cronjob.timezone: "{{global.schedule.timezone}}"
+        cronjob.alerts: "{{global.notifications.slack}}"
+        cronjob.policy: "retention {{global.backup.retention}} on {{global.backup.storage}}"
+        cronjon.normal-annotation: "normal-value"
+    asserts:
+      - equal:
+          path: metadata.annotations["cronjob.retention"]
+          value: 30d
+      - equal:
+          path: metadata.annotations["cronjob.storage"]
+          value: s3-backup
+      - equal:
+          path: metadata.annotations["cronjob.timezone"]
+          value: UTC
+      - equal:
+          path: metadata.annotations["cronjob.alerts"]
+          value: backup-alerts
+      - equal:
+          path: metadata.annotations["cronjob.policy"]
+          value: "retention 30d on s3-backup"
+      - equal:
+          path: metadata.annotations["cronjon.normal-annotation"]
+          value: "normal-value"

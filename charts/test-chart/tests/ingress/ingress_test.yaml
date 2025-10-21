@@ -141,3 +141,38 @@ tests:
       - equal:
           path: metadata.annotations["nginx.ingress.kubernetes.io/rewrite-target"]
           value: /
+
+  - it: should render global placeholders in annotations
+    values:
+      - ingress_values.yaml
+    set:
+      global:
+        loadbalancer:
+          class: "nginx-premium"
+          timeout: "300s"
+        tls:
+          issuer: "letsencrypt-prod"
+        monitoring:
+          enabled: true
+      ingresses.app-ingress.annotations:
+        ingress.lb-class: "{{global.loadbalancer.class}}"
+        ingress.timeout: "{{global.loadbalancer.timeout}}"
+        ingress.tls-issuer: "{{global.tls.issuer}}"
+        ingress.monitoring: "{{global.monitoring.enabled}}"
+        ingress.config: "LB {{global.loadbalancer.class}} with {{global.loadbalancer.timeout}} timeout"
+    asserts:
+      - equal:
+          path: metadata.annotations["ingress.lb-class"]
+          value: nginx-premium
+      - equal:
+          path: metadata.annotations["ingress.timeout"]
+          value: 300s
+      - equal:
+          path: metadata.annotations["ingress.tls-issuer"]
+          value: letsencrypt-prod
+      - equal:
+          path: metadata.annotations["ingress.monitoring"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["ingress.config"]
+          value: "LB nginx-premium with 300s timeout"

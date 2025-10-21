@@ -140,3 +140,99 @@ tests:
       - equal:
           path: spec.loadBalancerSourceRanges[1]
           value: 192.168.1.0/24
+
+  - it: should render global placeholders in annotations
+    values:
+      - service_values.yaml
+    set:
+      global:
+        environment: "production"
+        region: "us-west-2"
+        app:
+          version: "1.0.0"
+          name: "test-app"
+      services.api.annotations:
+        service.environment: "{{global.environment}}"
+        service.region: "{{global.region}}"
+        service.app-version: "{{global.app.version}}"
+        service.app-name: "{{global.app.name}}"
+        service.combined: "deployed {{global.app.name}} v{{global.app.version}} in {{global.region}}"
+    asserts:
+      - equal:
+          path: metadata.annotations["service.environment"]
+          value: production
+      - equal:
+          path: metadata.annotations["service.region"]
+          value: us-west-2
+      - equal:
+          path: metadata.annotations["service.app-version"]
+          value: "1.0.0"
+      - equal:
+          path: metadata.annotations["service.app-name"]
+          value: test-app
+      - equal:
+          path: metadata.annotations["service.combined"]
+          value: "deployed test-app v1.0.0 in us-west-2"
+
+  - it: should handle mixed normal and global annotations
+    values:
+      - service_values.yaml
+    set:
+      global:
+        environment: "staging"
+        version: "2.0.0"
+      services.api.annotations:
+        normal.annotation: "static-value"
+        kubernetes.io/service-type: "LoadBalancer"
+        global.environment: "{{global.environment}}"
+        global.version: "v{{global.version}}"
+        mixed.annotation: "env is {{global.environment}} with normal text"
+    asserts:
+      - equal:
+          path: metadata.annotations["normal.annotation"]
+          value: "static-value"
+      - equal:
+          path: metadata.annotations["kubernetes.io/service-type"]
+          value: "LoadBalancer"
+      - equal:
+          path: metadata.annotations["global.environment"]
+          value: "staging"
+      - equal:
+          path: metadata.annotations["global.version"]
+          value: "v2.0.0"
+      - equal:
+          path: metadata.annotations["mixed.annotation"]
+          value: "env is staging with normal text"
+
+  - it: should preserve normal annotations without global placeholders
+    values:
+      - service_values.yaml
+    set:
+      services.api.annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        custom.domain/annotation: "preserve-special-chars!@#$%"
+        multiline: |-
+          This is a multiline
+          annotation value
+          with multiple lines
+    asserts:
+      - equal:
+          path: metadata.annotations["prometheus.io/scrape"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["prometheus.io/port"]
+          value: "8080"
+      - equal:
+          path: metadata.annotations["prometheus.io/path"]
+          value: "/metrics"
+      - equal:
+          path: metadata.annotations["custom.domain/annotation"]
+          value: "preserve-special-chars!@#$%"
+      - equal:
+          path: metadata.annotations.multiline
+          value: |-
+            This is a multiline
+            annotation value
+            with multiple lines
