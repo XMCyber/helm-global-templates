@@ -354,3 +354,37 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.hostAliases
+
+  - it: should render global placeholders in annotations
+    values:
+      - statefulset_values.yaml
+    set:
+      global:
+        storage:
+          class: "fast-ssd"
+          size: "100Gi"
+        database:
+          type: "postgresql"
+          version: "13.4"
+      statefulsets.my-statefulset.annotations:
+        statefulset.storage-class: "{{global.storage.class}}"
+        statefulset.storage-size: "{{global.storage.size}}"
+        statefulset.db-type: "{{global.database.type}}"
+        statefulset.db-version: "{{global.database.version}}"
+        statefulset.config: "{{global.database.type}} v{{global.database.version}} on {{global.storage.class}}"
+    asserts:
+      - equal:
+          path: metadata.annotations["statefulset.storage-class"]
+          value: fast-ssd
+      - equal:
+          path: metadata.annotations["statefulset.storage-size"]
+          value: 100Gi
+      - equal:
+          path: metadata.annotations["statefulset.db-type"]
+          value: postgresql
+      - equal:
+          path: metadata.annotations["statefulset.db-version"]
+          value: "13.4"
+      - equal:
+          path: metadata.annotations["statefulset.config"]
+          value: "postgresql v13.4 on fast-ssd"

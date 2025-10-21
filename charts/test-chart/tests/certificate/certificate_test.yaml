@@ -190,3 +190,38 @@ tests:
       - equal:
           path: spec.commonName
           value: example.com
+
+  - it: should render global placeholders in annotations
+    values:
+      - certificate_values.yaml
+    set:
+      global:
+        tls:
+          issuer: "letsencrypt-prod"
+          duration: "2160h"
+        domain:
+          suffix: ".example.com"
+        security:
+          level: "high"
+      certificates.test-certificate.annotations:
+        certificate.issuer: "{{global.tls.issuer}}"
+        certificate.duration: "{{global.tls.duration}}"
+        certificate.domain-suffix: "{{global.domain.suffix}}"
+        certificate.security-level: "{{global.security.level}}"
+        certificate.config: "{{global.tls.issuer}} cert valid for {{global.tls.duration}}"
+    asserts:
+      - equal:
+          path: metadata.annotations["certificate.issuer"]
+          value: letsencrypt-prod
+      - equal:
+          path: metadata.annotations["certificate.duration"]
+          value: 2160h
+      - equal:
+          path: metadata.annotations["certificate.domain-suffix"]
+          value: .example.com
+      - equal:
+          path: metadata.annotations["certificate.security-level"]
+          value: high
+      - equal:
+          path: metadata.annotations["certificate.config"]
+          value: "letsencrypt-prod cert valid for 2160h"

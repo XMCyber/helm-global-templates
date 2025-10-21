@@ -44,6 +44,86 @@ tests:
           path: metadata.annotations["reloader.stakater.com/auto"]
           value: "true"
 
+  - it: should render global placeholders in annotations
+    values:
+      - deployment_values.yaml
+    set:
+      global:
+        environment: "staging"
+        cluster: "k8s-test"
+        team: "backend"
+        version: "2.1.0"
+      deployments.api.annotations:
+        deployment.environment: "{{global.environment}}"
+        deployment.cluster: "{{global.cluster}}"
+        deployment.team: "{{global.team}}"
+        deployment.version: "{{global.version}}"
+        deployment.info: "team {{global.team}} deployed to {{global.cluster}}"
+    asserts:
+      - equal:
+          path: metadata.annotations["deployment.environment"]
+          value: staging
+      - equal:
+          path: metadata.annotations["deployment.cluster"]
+          value: k8s-test
+      - equal:
+          path: metadata.annotations["deployment.team"]
+          value: backend
+      - equal:
+          path: metadata.annotations["deployment.version"]
+          value: "2.1.0"
+      - equal:
+          path: metadata.annotations["deployment.info"]
+          value: "team backend deployed to k8s-test"
+
+  - it: should handle normal annotations without breaking existing functionality
+    values:
+      - deployment_values.yaml
+    set:
+      deployments.api.annotations:
+        deployment.kubernetes.io/revision: "1"
+        app.kubernetes.io/component: "backend"
+        prometheus.io/scrape: "true"
+        custom.annotation: "normal-value"
+    asserts:
+      - equal:
+          path: metadata.annotations["deployment.kubernetes.io/revision"]
+          value: "1"
+      - equal:
+          path: metadata.annotations["app.kubernetes.io/component"]
+          value: "backend"
+      - equal:
+          path: metadata.annotations["prometheus.io/scrape"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["custom.annotation"]
+          value: "normal-value"
+
+  - it: should work with invalid global placeholders by keeping them as-is
+    values:
+      - deployment_values.yaml
+    set:
+      global:
+        existing: "value"
+      deployments.api.annotations:
+        valid.global: "{{global.existing}}"
+        invalid.global: "placeholder-global.nonexistent"
+        partial.global: "prefix global.nonexistent.nested suffix"
+        normal.annotation: "no-placeholders"
+    asserts:
+      - equal:
+          path: metadata.annotations["valid.global"]
+          value: "value"
+      - equal:
+          path: metadata.annotations["invalid.global"]
+          value: "placeholder-global.nonexistent"
+      - equal:
+          path: metadata.annotations["partial.global"]
+          value: "prefix global.nonexistent.nested suffix"
+      - equal:
+          path: metadata.annotations["normal.annotation"]
+          value: "no-placeholders"
+
   - it: should configure containers correctly
     values:
       - deployment_values.yaml

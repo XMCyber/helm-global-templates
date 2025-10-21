@@ -60,6 +60,40 @@ tests:
       - hasDocuments:
           count: 0
 
+  - it: should render global placeholders in annotations
+    values:
+      - hpa_values.yaml
+    set:
+      global:
+        autoscaling:
+          strategy: "predictive"
+          minReplicas: 2
+          maxReplicas: 50
+        monitoring:
+          prometheus: "kube-prometheus"
+      hpas.app-hpa.annotations:
+        hpa.strategy: "{{global.autoscaling.strategy}}"
+        hpa.min-replicas: "{{global.autoscaling.minReplicas}}"
+        hpa.max-replicas: "{{global.autoscaling.maxReplicas}}"
+        hpa.monitoring: "{{global.monitoring.prometheus}}"
+        hpa.config: "{{global.autoscaling.strategy}} scaling: {{global.autoscaling.minReplicas}}-{{global.autoscaling.maxReplicas}}"
+    asserts:
+      - equal:
+          path: metadata.annotations["hpa.strategy"]
+          value: predictive
+      - equal:
+          path: metadata.annotations["hpa.min-replicas"]
+          value: "2"
+      - equal:
+          path: metadata.annotations["hpa.max-replicas"]
+          value: "50"
+      - equal:
+          path: metadata.annotations["hpa.monitoring"]
+          value: kube-prometheus
+      - equal:
+          path: metadata.annotations["hpa.config"]
+          value: "predictive scaling: 2-50"
+
   - it: should work with default values
     set:
       hpas:
