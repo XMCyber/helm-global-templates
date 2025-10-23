@@ -184,7 +184,7 @@ tests:
       services.api.annotations:
         normal.annotation: "static-value"
         kubernetes.io/service-type: "LoadBalancer"
-        global.environment: "{{global.environment}}"
+        global.environment: "test-{{ global.environment }}"
         global.version: "v{{global.version}}"
         mixed.annotation: "env is {{global.environment}} with normal text"
     asserts:
@@ -196,7 +196,7 @@ tests:
           value: "LoadBalancer"
       - equal:
           path: metadata.annotations["global.environment"]
-          value: "staging"
+          value: "test-staging"
       - equal:
           path: metadata.annotations["global.version"]
           value: "v2.0.0"

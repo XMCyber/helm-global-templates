@@ -73,3 +73,146 @@ tests:
           path: metadata.labels.name
           value: dev-prod
         documentIndex: 1
+
+  - it: should create namespace with custom labels from map object
+    set:
+      namespaces:
+        - name: custom-ns
+          labels:
+            environment: production
+            team: platform
+            version: "1.2.3"
+    asserts:
+      - equal:
+          path: apiVersion
+          value: v1
+      - equal:
+          path: kind
+          value: Namespace
+      - equal:
+          path: metadata.name
+          value: custom-ns
+      - equal:
+          path: metadata.labels.name
+          value: custom-ns
+      - equal:
+          path: metadata.labels.environment
+          value: production
+      - equal:
+          path: metadata.labels.team
+          value: platform
+      - equal:
+          path: metadata.labels.version
+          value: "1.2.3"
+
+  - it: should merge custom labels with default labels
+    set:
+      namespaces:
+        - name: merge-test
+          labels:
+            environment: staging
+            custom-label: custom-value
+      common_defaults:
+        labels:
+          app.kubernetes.io/managed-by: helm
+          app.kubernetes.io/version: "2.0.0"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: merge-test
+      - equal:
+          path: metadata.labels.name
+          value: merge-test
+      - equal:
+          path: metadata.labels.environment
+          value: staging
+      - equal:
+          path: metadata.labels.custom-label
+          value: custom-value
+      - equal:
+          path: metadata.labels["app.kubernetes.io/managed-by"]
+          value: Helm
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: "2.0.0"
+
+  - it: should create multiple namespaces with mixed string and map formats
+    set:
+      namespaces:
+        - simple-string
+        - name: advanced-map
+          labels:
+            tier: frontend
+            env: dev
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: simple-string
+        documentIndex: 0
+      - equal:
+          path: metadata.labels.name
+          value: simple-string
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: advanced-map
+        documentIndex: 1
+      - equal:
+          path: metadata.labels.name
+          value: advanced-map
+        documentIndex: 1
+      - equal:
+          path: metadata.labels.tier
+          value: frontend
+        documentIndex: 1
+      - equal:
+          path: metadata.labels.env
+          value: dev
+        documentIndex: 1
+
+  - it: should handle namespace with prefix and custom labels
+    set:
+      global:
+        nsPrefix: staging
+      namespaces:
+        - name: api-service
+          labels:
+            component: backend
+            version: v1.4.0
+    asserts:
+      - equal:
+          path: metadata.name
+          value: staging-api-service
+      - equal:
+          path: metadata.labels.name
+          value: staging-api-service
+      - equal:
+          path: metadata.labels.component
+          value: backend
+      - equal:
+          path: metadata.labels.version
+          value: v1.4.0
+
+  - it: should apply only default labels when no custom labels provided in map
+    set:
+      namespaces:
+        - name: default-only
+      common_defaults:
+        labels:
+          managed-by: helm-global-templates
+          chart-version: "1.0"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: default-only
+      - equal:
+          path: metadata.labels.name
+          value: default-only
+      - equal:
+          path: metadata.labels.managed-by
+          value: helm-global-templates
+      - equal:
+          path: metadata.labels.chart-version
+          value: "1.0"
