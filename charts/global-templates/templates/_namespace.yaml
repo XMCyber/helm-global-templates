@@ -7,12 +7,28 @@ Author: Devops Infra Team
 {{- $global_values := .Values.global}}
 {{- $common_defaults := .Values.common_defaults }}
 {{- range .namespaces }}
+{{- if kindIs "string" . }}
+{{- $prefixedNamespaceName := include "helpers.prefixNamespace" (dict "namespace" . "global" $global_values) }}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  labels:
-    name: {{ include "helpers.prefixNamespace" (dict "namespace" . "global" $global_values) }}
-  name: {{ include "helpers.prefixNamespace" (dict "namespace" . "global" $global_values) }}
+  name: {{ $prefixedNamespaceName }}
+  labels: 
+    {{- include "helpers.labels" (dict "context" $ "customLabels" dict "defaultLabels" $common_defaults.labels) | nindent 4 }}
+    name: {{ $prefixedNamespaceName }}
+{{- else if kindIs "map" . }}
+{{- $prefixedNamespaceName := include "helpers.prefixNamespace" (dict "namespace" .name "global" $global_values) }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $prefixedNamespaceName }}
+  labels: 
+    {{- include "helpers.labels" (dict "context" $ "customLabels" .labels "defaultLabels" $common_defaults.labels) | nindent 4 }}
+    name: {{ $prefixedNamespaceName }}
+{{- else }}
+  {{- fail (printf "namespace must be either a string or an object with a 'name' field, got: %s" (kindOf .)) }}
+{{- end }}
 {{- end }}
 {{- end }}
