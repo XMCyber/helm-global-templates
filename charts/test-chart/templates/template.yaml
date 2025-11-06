@@ -18,3 +18,4 @@
 {{ include "global-templates.certificate" (dict "certificates" .Values.certificates "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Files" .Files "Template" .Template "Values" .Values) }}
 {{ include "global-templates.clusterissuer" (dict "clusterissuers" .Values.clusterissuers "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Files" .Files "Template" .Template "Values" .Values) }}
 {{ include "global-templates.issuer" (dict "issuers" .Values.issuers "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Files" .Files "Template" .Template "Values" .Values) }}
+  {{ include "global-templates.scaledobject" (dict "scaledobjects" .Values.scaledobjects "Chart" .Chart "Release" .Release "Capabilities" .Capabilities "Files" .Files "Template" .Template "Values" .Values) }}
