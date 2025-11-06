@@ -1,0 +1,80 @@
+suite: Test ScaledObject template
+templates:
+  - template.yaml
+
+tests:
+  - it: should create basic scaledobject correctly
+    values:
+      - scaledobject_values.yaml
+    asserts:
+      - equal:
+          path: kind
+          value: ScaledObject
+      - equal:
+          path: apiVersion
+          value: keda.sh/v1alpha1
+      - equal:
+          path: metadata.name
+          value: app-scaledobject
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - equal:
+          path: spec.scaleTargetRef.name
+          value: target
+      - equal:
+          path: spec.minReplicaCount
+          value: 1
+      - equal:
+          path: spec.maxReplicaCount
+          value: 5
+
+  - it: should set annotations correctly
+    values:
+      - scaledobject_values.yaml
+    set:
+      scaledobjects.app-scaledobject.annotations:
+        test-annotation: test-value
+    asserts:
+      - equal:
+          path: metadata.annotations["test-annotation"]
+          value: test-value
+
+  - it: should set labels correctly
+    values:
+      - scaledobject_values.yaml
+    set:
+      scaledobjects.app-scaledobject.labels:
+        custom-label: test-value
+    asserts:
+      - equal:
+          path: metadata.labels["custom-label"]
+          value: test-value
+  
+  - it: should not render scaledobject if disabled
+    values:
+      - scaledobject_values.yaml
+    set:
+      scaledobjects.app-scaledobject.disabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render global placeholders
+    values:
+      - scaledobject_values.yaml
+    set:
+      global:
+        autoscaling:
+          minReplicas: 2
+          maxReplicas: "50"
+      scaledobjects.app-scaledobject:
+        minReplicas: "{{global.autoscaling.minReplicas}}"
+        maxReplicas: "{{global.autoscaling.maxReplicas}}"
+    asserts:
+      - equal:
+          path: spec.minReplicaCount
+          value: 2
+      - equal:
+          path: spec.maxReplicaCount
+          value: 50

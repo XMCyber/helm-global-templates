@@ -20,8 +20,8 @@ metadata:
   annotations: {{ include "helpers.annotations" (dict "context" $ "customAnnotations" .annotations "defaultAnnotations" $common_defaults.annotations "reloaderEnabled" .reloaderEnabled) | nindent 4 }}
   {{- end }}
 spec:
-  minReplicaCount: {{ .minReplicas | default $default_values.minReplicas }}
-  maxReplicaCount: {{ .maxReplicas | default $default_values.maxReplicas }}
+  minReplicaCount: {{ include "helpers.renderGlobalIfExists" (dict "value" (.minReplicas | default $default_values.minReplicas) "global" $global_values) | int }}
+  maxReplicaCount: {{ include "helpers.renderGlobalIfExists" (dict "value" (.maxReplicas | default $default_values.maxReplicas) "global" $global_values) | int }}
   pollingInterval: {{ .pollingInterval | default $default_values.pollingInterval }}
   scaleTargetRef:
     apiVersion: {{ .targetApiVersion | default $default_values.targetApiVersion }}

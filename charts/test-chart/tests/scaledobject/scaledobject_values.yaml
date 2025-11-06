@@ -1,0 +1,19 @@
+scaledobjects:
+  app-scaledobject:
+    name: app-scaledobject
+    namespace: test-namespace
+    targetName: target
+    minReplicas: 1
+    maxReplicas: 5
+    pollingInterval: 30
+    targetApiVersion: apps/v1
+    targetKind: Deployment
+    triggers:
+      - type: kafka
+        metadata:
+          consumerGroup: test-group
+          bootstrapServers: test-kafka-bootstrap:9093
+          lagThreshold: "100"
+          tls: enable
+        authenticationRef:
+          name: test-kafka-auth
