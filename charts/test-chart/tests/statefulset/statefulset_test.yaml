@@ -175,6 +175,60 @@ tests:
           path: spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.key
           value: key2Ref
 
+  - it: should render global values in valueFrom correctly
+    values:
+      - statefulset_values.yaml
+    set:
+      global:
+        secretName: my-global-secret
+        secretKey: password
+        configMapName: my-global-config
+        configMapKey: api-key
+      statefulsets.my-statefulset.containers.api-container.env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ global.secretName }}"
+              key: "{{ global.secretKey }}"
+        - name: API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: "{{ global.configMapName }}"
+              key: "{{ global.configMapKey }}"
+        - name: MIXED_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: "prefix-{{ global.secretName }}-suffix"
+              key: "{{ global.secretKey }}"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: DB_PASSWORD
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: my-global-secret
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
+          value: password
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: API_KEY
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.configMapKeyRef.name
+          value: my-global-config
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.configMapKeyRef.key
+          value: api-key
+      - equal:
+          path: spec.template.spec.containers[0].env[2].name
+          value: MIXED_SECRET
+      - equal:
+          path: spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.name
+          value: prefix-my-global-secret-suffix
+      - equal:
+          path: spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.key
+          value: password
+
   - it: should set livenessProbe correctly
     values:
       - statefulset_values.yaml
