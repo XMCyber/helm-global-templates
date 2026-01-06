@@ -78,6 +78,23 @@ tests:
           path: spec.tls[0].secretName
           value: example-tls
 
+  - it: should set TLS configuration correctly - rendered
+    values:
+      - ingress_values.yaml
+    set:
+      global.test: rendered
+      ingresses.app-ingress.tls:
+        - hosts:
+            - "{{global.test}}.example.com"
+          secretName: example-tls
+    asserts:
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: rendered.example.com
+      - equal:
+          path: spec.tls[0].secretName
+          value: example-tls
+
   - it: should set multiple paths correctly
     values:
       - ingress_values.yaml

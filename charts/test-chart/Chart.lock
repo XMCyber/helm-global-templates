@@ -1,9 +1,9 @@
 dependencies:
 - name: global-templates
   repository: file://../global-templates
-  version: 1.12.4
+  version: 1.12.6
 - name: common
   repository: https://charts.bitnami.com/bitnami
   version: 2.27.0
-digest: sha256:04f742a533e4bee4af28f68eafade192496fcc64870f9ec7148bffb8111adb05
-generated: "2025-12-15T10:20:37.763161+02:00"
+digest: sha256:c6d2f3b449d45fac7323ac1c76e065fd20d4e53892a047e548aba00ab65ee960
+generated: "2026-01-06T15:03:01.789197+02:00"

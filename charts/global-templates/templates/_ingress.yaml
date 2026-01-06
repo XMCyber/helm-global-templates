@@ -45,7 +45,7 @@ spec:
     {{- range .tls }}
     - hosts:
       {{- range .hosts }}
-      - {{ . }}
+      - {{ include "helpers.renderGlobalIfExists" (dict "value" (. | default $default_values.host) "global" $global_values) | quote }}
       {{- end }}
       secretName: {{ .secretName }}
     {{- end }}
