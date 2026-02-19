@@ -77,7 +77,7 @@
 
 | Parameter                              | Type             | Required | Description                                                  |
 | -------------------------------------- | ---------------- | -------- | ------------------------------------------------------------ |
-| `volumes`                              | List of maps     | No       | A list of volumes for the Job.                               |
+| `volumes`                              | List of maps or map of maps | No | A list or map of volumes for the Job.                 |
 | `volumes[].name`                       | string           | Yes      | The name of the volume.                                      |
 | `volumes[].secret`                     | object           | No       | Secret volume configuration.                                 |
 | `volumes[].secret.secretName`          | string           | Yes      | The name of the secret.                                      |

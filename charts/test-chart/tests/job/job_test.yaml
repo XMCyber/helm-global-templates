@@ -254,3 +254,136 @@ tests:
           value:
             - "--migrate"
             - "--verbose"
+
+  - it: should set explicit serviceAccountName
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.serviceAccountName: my-service-account
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: my-service-account
+
+  - it: should fall back to default serviceAccountName when not specified
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: default
+
+  - it: should set tolerations correctly
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.tolerations:
+        - key: dedicated
+          operator: "Equal"
+          value: jobs
+          effect: NoSchedule
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations[0].key
+          value: dedicated
+      - equal:
+          path: spec.template.spec.tolerations[0].operator
+          value: "Equal"
+      - equal:
+          path: spec.template.spec.tolerations[0].value
+          value: jobs
+      - equal:
+          path: spec.template.spec.tolerations[0].effect
+          value: "NoSchedule"
+
+  - it: should render global placeholders in tolerations
+    values:
+      - job_values.yaml
+    set:
+      global:
+        pool: "batch-pool"
+      jobs.migration-job.tolerations:
+        - key: dedicated
+          value: "{{global.pool}}"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations[0].value
+          value: batch-pool
+
+  - it: should set init container environment variables correctly
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.initContainers:
+        - name: wait-for-db
+          image:
+            registry: docker.io
+            repository: busybox
+            tag: 1.35.0
+          command:
+            - /bin/sh
+            - -c
+            - "until nc -z db-host 5432; do sleep 2; done"
+          env:
+            DB_HOST: "db.example.com"
+            TIMEOUT: "30"
+    asserts:
+      - contains:
+          path: spec.template.spec.initContainers[0].env
+          content:
+            name: DB_HOST
+            value: "db.example.com"
+      - contains:
+          path: spec.template.spec.initContainers[0].env
+          content:
+            name: TIMEOUT
+            value: "30"
+
+  - it: should set init container envFrom correctly
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.initContainers:
+        - name: wait-for-db
+          image:
+            registry: docker.io
+            repository: busybox
+            tag: 1.35.0
+          envFrom:
+            - configMapRef:
+                name: init-config
+            - secretRef:
+                name: init-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.initContainers[0].envFrom
+          content:
+            configMapRef:
+              name: init-config
+      - contains:
+          path: spec.template.spec.initContainers[0].envFrom
+          content:
+            secretRef:
+              name: init-secret
+
+  - it: should set init container volumeMounts correctly
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.initContainers:
+        - name: wait-for-db
+          image:
+            registry: docker.io
+            repository: busybox
+            tag: 1.35.0
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+              readOnly: true
+    asserts:
+      - contains:
+          path: spec.template.spec.initContainers[0].volumeMounts
+          content:
+            name: config-volume
+            mountPath: /etc/config
+            readOnly: true

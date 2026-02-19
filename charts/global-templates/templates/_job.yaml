@@ -69,13 +69,13 @@ spec:
           image: {{ include "helpers.image.fullPath" (dict "container" . "global" $global_values) }}
           imagePullPolicy: {{ include "helpers.renderGlobalIfExists" (dict "value" (.imagePullPolicy | default $default_values.imagePullPolicy) "global" $global_values) }}
           {{- if .command }}
-          command: {{ .command | toYaml | nindent 10 }}
+          command: {{- include "common.tplvalues.render" (dict "value" .command "context" $) | nindent 12 }}
           {{- end }}
           {{- if .args }}
-          args: {{ .args | toYaml | nindent 10 }}
+          args: {{- include "common.tplvalues.render" (dict "value" .args "context" $) | nindent 12 }}
           {{- end }}
           {{- if .env }}
-          env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 10 }}
+          env: {{- include "helpers.toEnvArray" (dict "container" . "global" $global_values "context" $) | indent 12 }}
           {{- end }}
           {{- if .envFrom }}
           envFrom:
