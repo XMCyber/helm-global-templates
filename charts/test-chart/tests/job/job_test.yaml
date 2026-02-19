@@ -1,0 +1,256 @@
+suite: Test job template
+templates:
+  - template.yaml
+  
+tests:
+  - it: should create basic job correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: kind
+          value: Job
+      - equal:
+          path: apiVersion
+          value: batch/v1
+      - equal:
+          path: metadata.name
+          value: db-migration
+      - equal:
+          path: metadata.namespace
+          value: test-namespace
+      - equal:
+          path: metadata.labels.app
+          value: db-migration
+
+  - it: should set job spec fields correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.backoffLimit
+          value: 3
+      - equal:
+          path: spec.activeDeadlineSeconds
+          value: 3600
+      - equal:
+          path: spec.ttlSecondsAfterFinished
+          value: 300
+      - equal:
+          path: spec.completions
+          value: 1
+      - equal:
+          path: spec.parallelism
+          value: 1
+      - equal:
+          path: spec.completionMode
+          value: NonIndexed
+
+  - it: should set pod template spec correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: migration
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: docker.io/my-org/migration:2.0.0
+
+  - it: should set container environment variables correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_HOST
+            value: "db.example.com"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: LOG_LEVEL
+            value: "INFO"
+
+  - it: should set container envFrom correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: migration-config
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            secretRef:
+              name: migration-secret
+
+  - it: should set container resources correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 128Mi
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 512Mi
+
+  - it: should set volume mounts correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: data-volume
+            mountPath: /data/migration
+
+  - it: should set volumes correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: data-volume
+            configMap:
+              name: migration-config
+              items:
+                - key: config.yaml
+                  path: config.yaml
+
+  - it: should set metadata annotations correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations["argocd.argoproj.io/hook"]
+          value: "PreSync"
+
+  - it: should set metadata labels correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: "migration"
+
+  - it: should set pod annotations correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["prometheus.io/scrape"]
+          value: "false"
+
+  - it: should set pod labels correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels["job-type"]
+          value: "database-migration"
+
+  - it: should set init containers correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: wait-for-db
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: docker.io/busybox:1.35.0
+
+  - it: should use default values when not specified
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.backoffLimit: null
+      jobs.migration-job.restartPolicy: null
+    asserts:
+      - equal:
+          path: spec.backoffLimit
+          value: 6
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should handle disabled jobs
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.disabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should handle multiple jobs
+    values:
+      - job_values.yaml
+    set:
+      jobs.seed-job:
+        name: seed-data
+        namespace: test-namespace
+        containers:
+          - name: seed
+            image:
+              registry: docker.io
+              repository: busybox
+              tag: 1.35.0
+            command:
+              - /bin/sh
+              - -c
+              - "echo 'Seeding data...'"
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  - it: should render global placeholders in annotations
+    values:
+      - job_values.yaml
+    set:
+      global:
+        migration:
+          version: "v2.1"
+          owner: "platform-team"
+      jobs.migration-job.annotations:
+        migration.version: "{{global.migration.version}}"
+        migration.owner: "{{global.migration.owner}}"
+        migration.combined: "version {{global.migration.version}} by {{global.migration.owner}}"
+        migration.normal: "normal-value"
+    asserts:
+      - equal:
+          path: metadata.annotations["migration.version"]
+          value: v2.1
+      - equal:
+          path: metadata.annotations["migration.owner"]
+          value: platform-team
+      - equal:
+          path: metadata.annotations["migration.combined"]
+          value: "version v2.1 by platform-team"
+      - equal:
+          path: metadata.annotations["migration.normal"]
+          value: "normal-value"
+
+  - it: should set container command and args correctly
+    values:
+      - job_values.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - "--migrate"
+            - "--verbose"

@@ -4,6 +4,7 @@
 
 - [Deployment](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/deployment.md)
 - [CronJob](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/cronjob.md)
+- [Job](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/job.md)
 - [Statefulset](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/statefulset.md)
 - [Service](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/service.md)
 - [Cofigmap](https://github.com/XMCyber/helm-global-templates/blob/master/docs/resources/configmap.md)
