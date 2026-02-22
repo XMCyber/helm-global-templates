@@ -41,6 +41,18 @@ exports:
           cpu: 0.1
           memory: 0.5Gi
 
+    job_defaults:
+      backoffLimit: 6
+      restartPolicy: Never
+      imagePullPolicy: IfNotPresent
+      serviceAccountName: default
+      nodeAffinityPreset:
+        type: ""
+      resources:
+        requests:
+          cpu: 0.1
+          memory: 0.5Gi
+
     service_defaults:
 
     externalsecret_defaults:
