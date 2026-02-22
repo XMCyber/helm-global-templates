@@ -2,7 +2,7 @@ apiVersion: v2
 name: global-templates
 description: A library chart that provides a set of reusable templates for Helm Charts
 type: library
-version: 1.12.6
+version: 1.13.0
 dependencies:
   - name: common
     version: 2.27.0
