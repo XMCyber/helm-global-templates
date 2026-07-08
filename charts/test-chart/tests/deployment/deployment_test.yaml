@@ -589,3 +589,46 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.hostAliases
+
+  - it: should render optional in envFrom secretRef and configMapRef for containers
+    values:
+      - deployment_values.yaml
+    set:
+      deployments.api.containers.api-container.envFrom:
+        - secretRef:
+            name: optional-secret
+            optional: true
+        - configMapRef:
+            name: required-config
+            optional: false
+        - secretRef:
+            name: default-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.name
+          value: optional-secret
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.optional
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[1].configMapRef.optional
+          value: false
+      - notExists:
+          path: spec.template.spec.containers[0].envFrom[2].secretRef.optional
+
+  - it: should render optional in envFrom for initContainers
+    values:
+      - deployment_values.yaml
+    set:
+      deployments.api.initContainers.init-db.envFrom:
+        - secretRef:
+            name: optional-init-secret
+            optional: true
+        - configMapRef:
+            name: default-init-config
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].envFrom[0].secretRef.optional
+          value: true
+      - notExists:
+          path: spec.template.spec.initContainers[0].envFrom[1].configMapRef.optional

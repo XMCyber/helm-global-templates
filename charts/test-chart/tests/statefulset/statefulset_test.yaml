@@ -442,3 +442,26 @@ tests:
       - equal:
           path: metadata.annotations["statefulset.config"]
           value: "postgresql v13.4 on fast-ssd"
+
+  - it: should render optional in envFrom secretRef and configMapRef for containers
+    values:
+      - statefulset_values.yaml
+    set:
+      statefulsets.my-statefulset.containers.api-container.envFrom:
+        - secretRef:
+            name: optional-secret
+            optional: true
+        - configMapRef:
+            name: required-config
+            optional: false
+        - secretRef:
+            name: default-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.optional
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[1].configMapRef.optional
+          value: false
+      - notExists:
+          path: spec.template.spec.containers[0].envFrom[2].secretRef.optional

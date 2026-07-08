@@ -387,3 +387,32 @@ tests:
             name: config-volume
             mountPath: /etc/config
             readOnly: true
+
+  - it: should render optional in envFrom secretRef and configMapRef for containers
+    values:
+      - job_values.yaml
+    set:
+      jobs.migration-job.containers:
+        - name: migration
+          image:
+            registry: docker.io
+            repository: my-org/migration
+            tag: 2.0.0
+          envFrom:
+            - secretRef:
+                name: optional-secret
+                optional: true
+            - configMapRef:
+                name: required-config
+                optional: false
+            - secretRef:
+                name: default-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.optional
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[1].configMapRef.optional
+          value: false
+      - notExists:
+          path: spec.template.spec.containers[0].envFrom[2].secretRef.optional

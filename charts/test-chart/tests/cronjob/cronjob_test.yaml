@@ -271,3 +271,32 @@ tests:
       - equal:
           path: metadata.annotations["cronjon.normal-annotation"]
           value: "normal-value"
+
+  - it: should render optional in envFrom secretRef and configMapRef for containers
+    values:
+      - cronjob_values.yaml
+    set:
+      cronjobs.backup-job.containers:
+        - name: backup
+          image:
+            registry: docker.io
+            repository: busybox
+            tag: 1.35.0
+          envFrom:
+            - secretRef:
+                name: optional-secret
+                optional: true
+            - configMapRef:
+                name: required-config
+                optional: false
+            - secretRef:
+                name: default-secret
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[0].secretRef.optional
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[1].configMapRef.optional
+          value: false
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[2].secretRef.optional
